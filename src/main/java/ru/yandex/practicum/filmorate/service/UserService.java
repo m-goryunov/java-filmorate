@@ -32,8 +32,7 @@ public class UserService {
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             log.info("Пользователь " + user.getId() + " обновлён.");
-        }
-        else {
+        } else {
             throw new ValidateExeption("Обновление несуществующего пользователя.");
         }
         return user;

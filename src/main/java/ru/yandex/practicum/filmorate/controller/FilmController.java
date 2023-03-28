@@ -12,15 +12,17 @@ public class FilmController {
     private final FilmService service = new FilmService();
 
     @GetMapping("/films")
-    List<Film> getAllFilms(){return service.getAllFilms();}
+    List<Film> getAllFilms() {
+        return service.getAllFilms();
+    }
 
     @PostMapping(value = "/films")
-    Film addFilm(@RequestBody Film film){
+    Film addFilm(@RequestBody Film film) {
         return service.addFilm(film);
     }
 
     @PutMapping(value = "/films")
-    Film updateFilm(@RequestBody Film film){
+    Film updateFilm(@RequestBody Film film) {
         return service.updateFilm(film);
     }
 
