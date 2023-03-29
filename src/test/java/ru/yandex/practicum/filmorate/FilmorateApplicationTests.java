@@ -13,9 +13,6 @@ import java.time.LocalDate;
 @SpringBootTest
 class FilmorateApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
 
     @Test
     void validationServiceTest() {
