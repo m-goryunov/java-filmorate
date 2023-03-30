@@ -27,14 +27,14 @@ public class FilmService {
         validateFilm.validateFilm(film);
         film.setId(++id);
         films.put(film.getId(), film);
-        log.info("Фильм добавлен.", film.getId());
+        log.info("Фильм добавлен.{}", film.getId());
         return film;
     }
 
     public Film updateFilm(Film film) {
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
-            log.info("Фильм обновлён.", film.getId());
+            log.info("Фильм обновлён.{}", film.getId());
         } else {
             throw new ValidateExeption("Обновление несуществующего пользователя.");
         }

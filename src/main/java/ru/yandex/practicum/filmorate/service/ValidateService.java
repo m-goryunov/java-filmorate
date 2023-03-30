@@ -18,14 +18,14 @@ public class ValidateService {
         if (film.getReleaseDate().isBefore(VALID_DATE)) {
             throw new ValidateExeption("Дата релиза фильма не может быть раньше 28 декабря 1895 года.");
         }
-        log.debug("Фильм прошел проверку на дату", film.getId());
+        log.debug("Фильм прошел проверку на дату{}", film.getId());
     }
 
     public void validateUser(User user) {
 
-        if (user.getName() == null || user.getName().isEmpty()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
-            log.debug("Замена имени на логин.", user.getId());
+            log.debug("Замена имени на логин.{}", user.getId());
         }
     }
 

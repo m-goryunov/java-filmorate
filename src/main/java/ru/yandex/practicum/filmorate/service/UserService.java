@@ -28,14 +28,14 @@ public class UserService {
         validateUser.validateUser(user);
         user.setId(++id);
         users.put(user.getId(), user);
-        log.info("Пользователь добавлен.", user.getId());
+        log.info("Пользователь добавлен.{}", user.getId());
         return user;
     }
 
     public User updateUser(User user) {
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
-            log.info("Пользователь обновлён.", user.getId());
+            log.info("Пользователь обновлён.{}", user.getId());
         } else {
             throw new ValidateExeption("Обновление несуществующего пользователя.");
         }
