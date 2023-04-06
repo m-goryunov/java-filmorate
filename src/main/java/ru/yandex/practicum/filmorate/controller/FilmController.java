@@ -13,12 +13,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FilmController {
 
-    /*
-    PUT /films/{id}/like/{userId}  — пользователь ставит лайк фильму.
-    DELETE /films/{id}/like/{userId}  — пользователь удаляет лайк.
-    GET /films/popular?count={count} — возвращает список из первых count фильмов по количеству лайков.
-                                       Если значение параметра count не задано, верните первые 10.*/
-
     private final FilmService filmService;
     private final UserService userService;
 
@@ -53,7 +47,7 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular?count={count}")
-    List<Film> getMostPopularFilmsCount(@RequestParam(value = "count", defaultValue = "10") Integer count) {
+    List<Film> getMostPopularFilmsCount(@RequestParam(defaultValue = "10") Integer count) {
         return filmService.getMostPopularFilms(count);
     }
 

@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Comparator;
 import java.util.List;
@@ -15,14 +16,13 @@ import java.util.stream.Collectors;
 @Service
 public class InMemoryFilmService implements FilmService {
 
-    /*Будет отвечать за операции с фильмами, — добавление и удаление лайка, вывод 10 наиболее популярных фильмов по количеству лайков.
-    Пусть пока каждый пользователь может поставить лайк фильму только один раз.*/
-
     private final FilmStorage storage;
+    private final UserStorage userStorage;
 
     @Autowired
-    public InMemoryFilmService(FilmStorage storage) {
+    public InMemoryFilmService(FilmStorage storage, UserStorage userStorage) {
         this.storage = storage;
+        this.userStorage = userStorage;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public void addLike(Film film, User user) {
-        if (storage.getFilmById(user.getId()) == null || storage.getFilmById(film.getId()) == null) {
+        if (userStorage.getUserById(user.getId()) == null || storage.getFilmById(film.getId()) == null) {
             throw new UserNotFoundException("Фильм/Пользователь не найден.");
         }
         film.addLike(user.getId());
@@ -56,8 +56,8 @@ public class InMemoryFilmService implements FilmService {
     @Override
     public List<Film> getMostPopularFilms(Integer count) {
         return storage.getAllFilms().stream()
-                .limit(count)
                 .sorted(Comparator.comparing(Film::getLikesCount))
+                .limit(count)
                 .collect(Collectors.toList());
     }
 

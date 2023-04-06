@@ -21,7 +21,6 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private long duration;
-    //public static final Comparator<Film> LIKES_COMPARATOR = new LikesCountComparator();
     private final Set<Integer> likes = new HashSet<>();
 
     public void addLike(Integer id) {
