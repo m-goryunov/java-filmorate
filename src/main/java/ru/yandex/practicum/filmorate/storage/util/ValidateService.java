@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidateExeption;
+import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -16,7 +16,7 @@ public class ValidateService {
     public void validateFilm(Film film) {
 
         if (film.getReleaseDate().isBefore(VALID_DATE)) {
-            throw new ValidateExeption("Дата релиза фильма не может быть раньше 28 декабря 1895 года.");
+            throw new ValidateException("Дата релиза фильма не может быть раньше 28 декабря 1895 года.");
         }
         log.debug("Фильм прошел проверку на дату{}", film.getId());
     }

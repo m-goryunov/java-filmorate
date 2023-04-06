@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidateExeption;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.util.ValidateService;
@@ -40,8 +40,17 @@ public class InMemoryFilmStorage implements FilmStorage {
             films.put(film.getId(), film);
             log.info("Фильм обновлён.{}", film.getId());
         } else {
-            throw new ValidateExeption("Обновление несуществующего пользователя.");
+            throw new UserNotFoundException("Обновление несуществующего фильма.");
         }
         return film;
+    }
+
+    @Override
+    public Film getFilmById(Integer id) {
+        if (films.get(id) == null) {
+            throw new UserNotFoundException("Фильм не существует");
+        }
+
+        return films.get(id);
     }
 }
