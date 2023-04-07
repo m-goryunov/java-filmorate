@@ -7,17 +7,22 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.util.ValidateService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Slf4j
+@Validated
 @RestController
 @RequiredArgsConstructor
 public class FilmController {
 
     private final FilmService filmService;
     private final UserService userService;
+    private final ValidateService validateFilm;
 
     @GetMapping("/films")
     List<Film> getAllFilms() {
@@ -31,6 +36,7 @@ public class FilmController {
 
     @PostMapping(value = "/films")
     Film addFilm(@Valid @RequestBody Film film) {
+        validateFilm.validateFilm(film);
         return filmService.addFilm(film);
     }
 
@@ -49,10 +55,8 @@ public class FilmController {
         filmService.deleteLike(filmService.getFilmById(id), userService.getUserById(userId));
     }
 
-    @Validated
     @GetMapping("/films/popular")
-    List<Film> getMostPopularFilmsCount(@RequestParam(defaultValue = "10", required = false) Integer count) {
-        log.info("count передан из контроллера{}", count);
+    List<Film> getMostPopularFilmsCount(@Positive @NotNull @RequestParam(defaultValue = "10", required = false) Integer count) {
         return filmService.getMostPopularFilms(count);
     }
 }

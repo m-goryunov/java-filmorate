@@ -3,21 +3,21 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.storage.util.ValidateService;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class InMemoryUserStorage implements UserStorage {
 
-    private final ValidateService validateUser;
+
     private final Map<Integer, User> users = new HashMap<>();
     private Integer id = 0;
 
@@ -27,16 +27,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(Integer id) {
-        if (users.get(id) == null) {
-            throw new UserNotFoundException("Пользователь не существует");
-        }
-        return users.get(id);
+    public Optional<User> getUserById(Integer id) {
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
     public User addUser(User user) {
-        validateUser.validateUser(user);
         user.setId(++id);
         users.put(user.getId(), user);
         log.info("Пользователь добавлен.{}", user.getId());
@@ -49,7 +45,7 @@ public class InMemoryUserStorage implements UserStorage {
             users.put(user.getId(), user);
             log.info("Пользователь обновлён.{}", user.getId());
         } else {
-            throw new UserNotFoundException("Пользователь не существует.");
+            throw new EntityNotFoundException("Пользователь не существует.", getClass().toString());
         }
         return user;
     }

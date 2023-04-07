@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.util.ValidateService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final ValidateService validateUser;
 
     @GetMapping("/users")
     List<User> getAllUsers() {
@@ -26,6 +28,7 @@ public class UserController {
 
     @PostMapping(value = "/users")
     User addUser(@Valid @RequestBody User user) {
+        validateUser.validateUser(user);
         return userService.addUser(user);
     }
 

@@ -20,7 +20,5 @@ public interface FilmService {
 
     List<Film> getMostPopularFilms(Integer count);
 
-    List<Film> getMostPopularFilms();
-
     Film getFilmById(Integer id);
 }

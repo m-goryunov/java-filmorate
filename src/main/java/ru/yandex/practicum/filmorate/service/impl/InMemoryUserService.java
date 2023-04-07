@@ -2,13 +2,13 @@ package ru.yandex.practicum.filmorate.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class InMemoryUserService implements UserService {
@@ -27,7 +27,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public User getUserById(Integer id) {
-        return storage.getUserById(id);
+        return storage.getUserById(id).orElseThrow(() -> new EntityNotFoundException("Фильм/Пользователь не найден.", getClass().toString()));
     }
 
     @Override
@@ -42,9 +42,6 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public void addFriend(User user, User otherUser) {
-        if (storage.getUserById(user.getId()) == null || storage.getUserById(otherUser.getId()) == null) {
-            throw new UserNotFoundException("Пользователь не найден.");
-        }
         user.addFriend(otherUser);
         otherUser.addFriend(user);
     }
@@ -57,24 +54,15 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public List<User> getMutualFriends(User user, User otherUser) {
-        if (storage.getUserById(user.getId()) == null || storage.getUserById(otherUser.getId()) == null) {
-            throw new UserNotFoundException("Пользователь не найден.");
-        }
         List<User> a = getFriendsList(user);
         List<User> b = getFriendsList(otherUser);
-
         a.retainAll(b);
-
         return a;
     }
 
     @Override
     public List<User> getFriendsList(User user) {
-        List<User> friends = new ArrayList<>();
-        for (Integer id : user.getFriends()) {
-            friends.add(storage.getUserById(id));
-        }
-        return friends;
+        return user.getFriends().stream().map(this::getUserById).collect(Collectors.toList());
     }
 
 }
