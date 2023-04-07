@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -9,6 +11,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class FilmController {
@@ -46,14 +49,10 @@ public class FilmController {
         filmService.deleteLike(filmService.getFilmById(id), userService.getUserById(userId));
     }
 
-    @GetMapping("/films/popular?count={count}")
-    List<Film> getMostPopularFilmsCount(@RequestParam(defaultValue = "10") Integer count) {
+    @Validated
+    @GetMapping("/films/popular")
+    List<Film> getMostPopularFilmsCount(@RequestParam(defaultValue = "10", required = false) Integer count) {
+        log.info("count передан из контроллера{}", count);
         return filmService.getMostPopularFilms(count);
     }
-
-    @GetMapping("/films/popular")
-    List<Film> getMostPopularFilms() {
-        return filmService.getMostPopularFilms();
-    }
-
 }

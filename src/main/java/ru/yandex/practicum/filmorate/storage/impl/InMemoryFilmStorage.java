@@ -50,7 +50,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (films.get(id) == null) {
             throw new UserNotFoundException("Фильм не существует");
         }
-
         return films.get(id);
+    }
+
+    @Override
+    public void removeFilm(Integer id) {
+        if (films.get(id) == null) {
+            throw new UserNotFoundException("Фильм не существует");
+        }
+        films.remove(id);
     }
 }

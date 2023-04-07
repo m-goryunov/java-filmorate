@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
@@ -9,40 +10,42 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Comparator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class InMemoryFilmService implements FilmService {
 
-    private final FilmStorage storage;
+    private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
     @Autowired
-    public InMemoryFilmService(FilmStorage storage, UserStorage userStorage) {
-        this.storage = storage;
+    public InMemoryFilmService(FilmStorage filmStorage, UserStorage userStorage) {
+        this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
 
     @Override
     public List<Film> getAllFilms() {
-        return storage.getAllFilms();
+        return filmStorage.getAllFilms();
     }
 
     @Override
     public Film addFilm(Film film) {
-        return storage.addFilm(film);
+        return filmStorage.addFilm(film);
     }
 
     @Override
     public Film updateFilm(Film film) {
-        return storage.updateFilm(film);
+        return filmStorage.updateFilm(film);
     }
 
     @Override
     public void addLike(Film film, User user) {
-        if (userStorage.getUserById(user.getId()) == null || storage.getFilmById(film.getId()) == null) {
+        if (userStorage.getUserById(user.getId()) == null || filmStorage.getFilmById(film.getId()) == null) {
             throw new UserNotFoundException("Фильм/Пользователь не найден.");
         }
         film.addLike(user.getId());
@@ -54,23 +57,32 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getMostPopularFilms(Integer count) {
-        return storage.getAllFilms().stream()
-                .sorted(Comparator.comparing(Film::getLikesCount))
+    public List<Film> getMostPopularFilms(@Positive @NotNull Integer count) {
+        log.info("count передан из сервиса{}", count);
+        return filmStorage.getAllFilms().stream()
+                .sorted((o1, o2) -> {
+                    int result = o1.getLikesCount().compareTo(o2.getLikesCount());
+                    result = result * -1;
+                    return result;
+                })
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Film> getMostPopularFilms() {
-        return storage.getAllFilms().stream()
-                .sorted(Comparator.comparing(Film::getLikesCount))
+        return getAllFilms().stream()
+                .sorted((o1, o2) -> {
+                    int result = o1.getLikesCount().compareTo(o2.getLikesCount());
+                    result = result * -1;
+                    return result;
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     public Film getFilmById(Integer id) {
-        return storage.getFilmById(id);
+        return filmStorage.getFilmById(id);
     }
 
 }
