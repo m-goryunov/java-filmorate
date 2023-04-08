@@ -1,43 +1,24 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ValidateExeption;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@Service
-@Slf4j
-@RequiredArgsConstructor
-public class FilmService {
-    private final ValidateService validateFilm;
-    private final Map<Integer, Film> films = new HashMap<>();
-    private Integer id = 0;
+public interface FilmService {
 
 
-    public List<Film> getAllFilms() {
-        return List.copyOf(films.values());
-    }
+    List<Film> getAllFilms();
 
-    public Film addFilm(Film film) {
-        validateFilm.validateFilm(film);
-        film.setId(++id);
-        films.put(film.getId(), film);
-        log.info("Фильм добавлен.{}", film.getId());
-        return film;
-    }
+    Film addFilm(Film film);
 
-    public Film updateFilm(Film film) {
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            log.info("Фильм обновлён.{}", film.getId());
-        } else {
-            throw new ValidateExeption("Обновление несуществующего пользователя.");
-        }
-        return film;
-    }
+    Film updateFilm(Film film);
+
+    void addLike(Film film, User user);
+
+    void deleteLike(Film film, User user);
+
+    List<Film> getMostPopularFilms(Integer count);
+
+    Film getFilmById(Integer id);
 }

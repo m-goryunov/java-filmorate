@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.exception.ValidateExeption;
+import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.ValidateService;
+import ru.yandex.practicum.filmorate.storage.util.ValidateService;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -54,7 +54,7 @@ class FilmorateApplicationTests {
                 "_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn_ghbdtn");
 
         film.setReleaseDate(LocalDate.of(1892, 12, 28));
-        Assertions.assertThrows(ValidateExeption.class, () -> validateService.validateFilm(film), "Дата релиза ранее заданной.");
+        Assertions.assertThrows(ValidateException.class, () -> validateService.validateFilm(film), "Дата релиза ранее заданной.");
         film.setDuration(-2000);
 
         Set<ConstraintViolation<Film>> filmViolations = validator.validate(film);
