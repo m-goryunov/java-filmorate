@@ -19,7 +19,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
-        log.info("Произошла непредвиденная ошибка. Код 500");
+        log.info("Произошла непредвиденная ошибка. Код 500 {}", e.getMessage());
         e.printStackTrace();
         return new ErrorResponse(
                 "Произошла непредвиденная ошибка."
@@ -29,14 +29,16 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidateException(final ValidateException e) {
-        log.info("Произошла ошибка валидации");
+        log.info("Произошла ошибка валидации {}", e.getMessage());
+        e.printStackTrace();
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleEntityNotFoundException(final EntityNotFoundException e) {
-        log.info("Ошибка. Объект не найден.");
+        log.info("Ошибка. Объект не найден. {}", e.getMessage());
+        e.printStackTrace();
         return new ErrorResponse(
                 e.getMessage()
         );
@@ -44,8 +46,9 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleConstraint(ConstraintViolationException ex) {
-        log.info("Значение count некорректно.");
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleConstraint(ConstraintViolationException e) {
+        log.info("Значение count некорректно. {}", e.getMessage());
+        e.printStackTrace();
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

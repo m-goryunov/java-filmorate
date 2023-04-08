@@ -9,8 +9,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +49,7 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public List<Film> getMostPopularFilms(@Positive @NotNull Integer count) {
+    public List<Film> getMostPopularFilms(Integer count) {
         return filmStorage.getAllFilms().stream()
                 .sorted((o1, o2) -> o2.getLikesCount().compareTo(o1.getLikesCount()))
                 .limit(count)
@@ -60,7 +58,8 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film getFilmById(Integer id) {
-        return filmStorage.getFilmById(id).orElseThrow(() -> new EntityNotFoundException("Фильм/Пользователь не найден.", getClass().toString()));
+        return filmStorage.getFilmById(id).orElseThrow(() ->
+                new EntityNotFoundException("Фильм/Пользователь не найден.", getClass().toString()));
     }
 
 }
