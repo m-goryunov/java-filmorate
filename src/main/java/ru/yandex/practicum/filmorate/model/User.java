@@ -23,6 +23,7 @@ public class User {
     private LocalDate birthday;
     @JsonIgnore
     private final Set<Integer> friends = new HashSet<>();
+    private boolean isFriendRequestAccepted;
 
     public void addFriend(User user) {
         friends.add(user.getId());
