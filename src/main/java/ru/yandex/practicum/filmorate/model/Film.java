@@ -24,6 +24,8 @@ public class Film {
     private long duration;
     @JsonIgnore
     private final Set<Integer> likes = new HashSet<>();
+    private String genre;
+    private String rating;
 
     public void addLike(Integer id) {
         likes.add(id);
