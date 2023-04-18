@@ -1,6 +1,6 @@
 ## Filmorate Application by MG
 ### Project ER Diagram:
-![](src/main/java/ru/yandex/practicum/filmorate/storage/util/image/DB_Filmorate.png)
+![](db/DB_Filmorate.png)
 
 Ссылка на диаграму с её кодом:
 https://app.quickdatabasediagrams.com/#/d/A1hIWc

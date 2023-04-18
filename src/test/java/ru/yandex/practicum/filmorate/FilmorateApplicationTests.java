@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.util.ValidateService;
+import ru.yandex.practicum.filmorate.service.util.ValidateService;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -12,11 +13,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class InMemoryUserService implements UserService {
-
     private final UserStorage storage;
 
     @Autowired
-    public InMemoryUserService(UserStorage storage) {
+    public InMemoryUserService(@Qualifier("inMemoryUserStorage") UserStorage storage) {
         this.storage = storage;
     }
 
@@ -32,7 +32,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public User addUser(User user) {
-        return storage.addUser(user);
+        return storage.createUser(user);
     }
 
     @Override

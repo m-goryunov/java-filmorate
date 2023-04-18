@@ -22,6 +22,26 @@ public class InMemoryUserStorage implements UserStorage {
     private Integer id = 0;
 
     @Override
+    public void addFriend(User user, User otherUser, boolean friendshipStatus) {
+        throw new UnsupportedOperationException("Реализация существует только при работе с БД");
+    }
+
+    @Override
+    public void removeFriend(User user, User otherUser) {
+        throw new UnsupportedOperationException("Реализация существует только при работе с БД");
+    }
+
+    @Override
+    public boolean checkFriendship(User user, User otherUser) {
+        throw new UnsupportedOperationException("Реализация существует только при работе с БД");
+    }
+
+    @Override
+    public List<User> getFriendsList(User user) {
+        throw new UnsupportedOperationException("Реализация существует только при работе с БД");
+    }
+
+    @Override
     public List<User> getAllUsers() {
         return List.copyOf(users.values());
     }
@@ -32,7 +52,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User addUser(User user) {
+    public User createUser(User user) {
         user.setId(++id);
         users.put(user.getId(), user);
         log.info("Пользователь добавлен.{}", user.getId());

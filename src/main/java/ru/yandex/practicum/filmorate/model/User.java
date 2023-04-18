@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Generated;
+import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -9,7 +12,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 public class User {
+    @Id
     private Integer id;
     @Email
     @NotEmpty
@@ -17,10 +22,10 @@ public class User {
     @NotBlank
     @Pattern(regexp = "^[A-Za-z]*$")
     private String login;
-    private String name;
     @PastOrPresent
     @NotNull
     private LocalDate birthday;
+    private String name;
     @JsonIgnore
     private final Set<Integer> friends = new HashSet<>();
     private boolean isFriendRequestAccepted;
