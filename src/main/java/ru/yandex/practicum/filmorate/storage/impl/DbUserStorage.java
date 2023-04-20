@@ -4,17 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -75,16 +76,32 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        log.info("Попытка добавить пользователя");
+
+
+        String sqlQuery = "insert into FILMORATE_USER(USER_ID,USER_EMAIL, USER_LOGIN, USER_BIRTHDAY) " +
+                "values (?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
+            stmt.setString(1, user.getEmail());
+            stmt.setString(2, user.getLogin());
+            stmt.setDate(3, Date.valueOf(user.getBirthday()));
+            return stmt;
+        }, keyHolder);
+
+        user.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
+        return user;
+
+/*        log.info("Попытка добавить пользователя");
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("FILMORATE_USER")
                 .usingGeneratedKeyColumns("USER_ID");
         log.info("Пользователь добавлен. id: {}", simpleJdbcInsert.executeAndReturnKey(UserToMap(user)));
 
-/*        String sql = "insert into FILMORATE_USER(USER_EMAIL, USER_LOGIN, USER_BIRTHDAY)" +
+        String sql = "insert into FILMORATE_USER(USER_EMAIL, USER_LOGIN, USER_BIRTHDAY)" +
                 "VALUES (?,?,?)";
-        jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getBirthday());*/
-        return user;
+        jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getBirthday());
+        return user;*/
 
     }
 
