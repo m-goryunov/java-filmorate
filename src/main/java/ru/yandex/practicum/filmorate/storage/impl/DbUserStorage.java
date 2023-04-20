@@ -30,23 +30,23 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public void addFriend(User user, User otherUser, boolean friendshipStatus) {
-        String sql = "insert into USER_FRIENDS(USER_ID, FRIEND_ID, FRIENDSHIP_STATUS)" +
+        String sql = "insert into SCHEMA.USER_FRIENDS(USER_ID, FRIEND_ID, FRIENDSHIP_STATUS)" +
                 "VALUES (?,?,?)";
         jdbcTemplate.update(sql, user.getId(), otherUser.getId(), friendshipStatus);
     }
 
     @Override
     public void removeFriend(User user, User otherUser) {
-        String sql = "delete from USER_FRIENDS " +
+        String sql = "delete from SCHEMA.USER_FRIENDS " +
                 "where USER_ID = ? AND FRIEND_ID = ?";
-        jdbcTemplate.update(sql,user.getId(),otherUser.getId());
+        jdbcTemplate.update(sql, user.getId(), otherUser.getId());
     }
 
 
     @Override
     public boolean checkFriendship(User user, User otherUser) {
         String sqlQuery = "select FRIENDSHIP_STATUS " +
-                "from USER_FRIENDS " +
+                "from SCHEMA.USER_FRIENDS " +
                 "where USER_ID = ? AND FRIEND_ID = ?";
         SqlRowSet response = jdbcTemplate.queryForRowSet(sqlQuery, user.getId(), otherUser.getId());
 
@@ -55,62 +55,51 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public List<User> getFriendsList(User user) {
-        String sql = "select * from USER_FRIENDS where USER_ID = ?";
+        String sql = "SELECT * FROM SCHEMA.USER_FRIENDS where USER_ID = ?";
 
-        return jdbcTemplate.query(sql,this::mapRowToUser, user.getId());
+        return jdbcTemplate.query(sql, this::mapRowToUser, user.getId());
     }
 
     @Override
     public List<User> getAllUsers() {
-        String sqlQuery = "select * from FILMORATE_USER";
+        String sqlQuery = "select * from SCHEMA.USER_FILMORATE";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
     @Override
     public Optional<User> getUserById(Integer id) {
-        String sqlQuery = "select USER_ID,USER_EMAIL,USER_LOGIN,USER_BIRTHDAY,NAME " +
-                "from FILMORATE_USER " +
-                "where USER_ID = ?";
+        String sqlQuery = "select ID, EMAIL, LOGIN, BIRTHDAY,NAME " +
+                "from SCHEMA.USER_FILMORATE " +
+                "where ID = ?";
         return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id));
     }
 
     @Override
     public User createUser(User user) {
-
-
-        String sqlQuery = "insert into FILMORATE_USER(USER_ID,USER_EMAIL, USER_LOGIN, USER_BIRTHDAY) " +
+        log.info("Попытка добавить пользователя");
+        String sqlQuery = "insert into SCHEMA.USER_FILMORATE(EMAIL, LOGIN, BIRTHDAY, NAME) " +
                 "values (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"ID"});
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getLogin());
             stmt.setDate(3, Date.valueOf(user.getBirthday()));
+            stmt.setString(4, user.getName());
             return stmt;
         }, keyHolder);
 
         user.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
+        log.info("Пользователь добавлен. id: {}", user.getId());
         return user;
-
-/*        log.info("Попытка добавить пользователя");
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("FILMORATE_USER")
-                .usingGeneratedKeyColumns("USER_ID");
-        log.info("Пользователь добавлен. id: {}", simpleJdbcInsert.executeAndReturnKey(UserToMap(user)));
-
-        String sql = "insert into FILMORATE_USER(USER_EMAIL, USER_LOGIN, USER_BIRTHDAY)" +
-                "VALUES (?,?,?)";
-        jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getBirthday());
-        return user;*/
-
     }
 
     @Override
     public User updateUser(User user) {
         log.info("Попытка обновить пользователя id: {}", user.getId());
-        String sqlQuery = "update FILMORATE_USER set " +
-                "USER_EMAIL = ?, USER_LOGIN = ?, USER_BIRTHDAY = ?, NAME = ? " +
-                "where USER_ID = ?";
+        String sqlQuery = "update SCHEMA.USER_FILMORATE set " +
+                "EMAIL = ?, LOGIN = ?, BIRTHDAY = ?, NAME = ? " +
+                "where ID = ?";
         jdbcTemplate.update(sqlQuery
                 , user.getEmail()
                 , user.getLogin()
@@ -123,20 +112,20 @@ public class DbUserStorage implements UserStorage {
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
-                .id(resultSet.getInt("USER_ID"))
-                .name(resultSet.getString("USER_NAME"))
-                .login(resultSet.getString("USER_LOGIN"))
-                .email(resultSet.getString("USER_EMAIL"))
-                .birthday(resultSet.getDate("USER_BIRTHDAY").toLocalDate())
+                .id(resultSet.getInt("ID"))
+                .name(resultSet.getString("NAME"))
+                .login(resultSet.getString("LOGIN"))
+                .email(resultSet.getString("EMAIL"))
+                .birthday(resultSet.getDate("BIRTHDAY").toLocalDate())
                 .build();
     }
 
     private Map<String, Object> UserToMap(User user) {
         Map<String, Object> values = new HashMap<>();
-        values.put("USER_EMAIL", user.getEmail());
-        values.put("USER_LOGIN", user.getLogin());
-        values.put("USER_BIRTHDAY", user.getBirthday());
-        values.put("USER_NAME", user.getName());
+        values.put("EMAIL", user.getEmail());
+        values.put("LOGIN", user.getLogin());
+        values.put("BIRTHDAY", user.getBirthday());
+        values.put("NAME", user.getName());
         return values;
     }
 }

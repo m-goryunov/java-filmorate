@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -30,8 +32,8 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public Film addFilm(Film film) {
-        return filmStorage.addFilm(film);
+    public Film createFilm(Film film) {
+        return filmStorage.createFilm(film);
     }
 
     @Override
@@ -63,4 +65,28 @@ public class InMemoryFilmService implements FilmService {
                 new EntityNotFoundException("Фильм/Пользователь не найден.", getClass().toString()));
     }
 
+    @Override
+    public Genre getGenre(Integer id) {
+        throw new UnsupportedOperationException("Реализация существует только при работе с БД");
+    }
+
+    @Override
+    public List<Genre> getFilmGenre(Integer id) {
+        throw new UnsupportedOperationException("Реализация существует только при работе с БД");
+    }
+
+    @Override
+    public List<Genre> getAllFilmGenre() {
+        throw new UnsupportedOperationException("Реализация существует только при работе с БД");
+    }
+
+    @Override
+    public Rating getRating(Integer id) {
+        throw new UnsupportedOperationException("Реализация существует только при работе с БД");
+    }
+
+    @Override
+    public List<Rating> getAllRatings() {
+        throw new UnsupportedOperationException("Реализация существует только при работе с БД");
+    }
 }

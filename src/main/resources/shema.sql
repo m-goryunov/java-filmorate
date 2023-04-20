@@ -28,7 +28,7 @@ alter table FILM
 
 
 
-create table IF NOT EXISTS FILMORATE_USER
+create table IF NOT EXISTS USER_FILMORATE
 (
     ID       IDENTITY NOT NULL PRIMARY KEY,
     EMAIL    VARCHAR,
@@ -65,9 +65,9 @@ create table if not exists USER_FRIENDS
     FRIEND_ID  LONG,
     FRIENDSHIP_STATUS BOOLEAN,
     constraint "friend_FILMORATE_USER_ID_fk"
-        foreign key (USER_ID) references FILMORATE_USER,
+        foreign key (USER_ID) references USER_FILMORATE,
     constraint "friend_FILMORATE_USER_ID_fk2"
-        foreign key (FRIEND_ID) references FILMORATE_USER
+        foreign key (FRIEND_ID) references USER_FILMORATE
 );
 
 create table if not exists FILM_LIKES
@@ -75,7 +75,7 @@ create table if not exists FILM_LIKES
     FILM_ID INTEGER NOT NULL,
     USER_ID_LIKE LONG NOT NULL,
     constraint "user_film_likes_FILMORATE_USER_ID_fk"
-        foreign key (USER_ID_LIKE) references FILMORATE_USER,
+        foreign key (USER_ID_LIKE) references USER_FILMORATE,
     constraint "user_film_likes_FILM_ID_fk"
         foreign key (FILM_ID) references FILM
 );
