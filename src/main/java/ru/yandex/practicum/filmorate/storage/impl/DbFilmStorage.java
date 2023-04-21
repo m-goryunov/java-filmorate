@@ -90,11 +90,16 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         String sqlQuery = "UPDATE SCHEMA.FILM SET " +
-                "NAME = ?, DESCRIPTION = ?, DURATION = ?, RELEASE_DATE = ?, RATING_ID = ?" +
-                "WHERE id = ?";
+                "RATING_ID = ?, NAME = ?, DESCRIPTION = ?, DURATION = ?, RELEASE_DATE = ?" +
+                "WHERE ID = ?";
         String deleteSqlQuery = "DELETE FROM SCHEMA.FILM_GENRE WHERE FILM_ID = ?";
-        int rows = jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getDuration(),
-                film.getReleaseDate(), film.getMpa().getId(), film.getId());
+        int rows = jdbcTemplate.update(sqlQuery,
+                film.getMpa().getId(),
+                film.getName(),
+                film.getDescription(),
+                film.getDuration(),
+                film.getReleaseDate(),
+                film.getId());
         if (rows == 0) {
             throw new EntityNotFoundException("Обновление несуществующего фильма.", getClass().toString());
         }
@@ -136,9 +141,13 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Genre> getGenre(Integer id) {
-        String sqlQuery = "SELECT ID, NAME FROM SCHEMA.GENRE WHERE ID = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, map::mapRowToGenre, id));
+    public Genre getGenre(Integer id) {
+        try {
+            String sqlQuery = "SELECT ID, NAME FROM SCHEMA.GENRE WHERE ID = ?";
+            return jdbcTemplate.queryForObject(sqlQuery, map::mapRowToGenre, id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NoSuchElementException("Жанр отсутствует." + e.getMessage());
+        }
     }
 
     @Override
@@ -160,9 +169,13 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Rating> getRating(Integer id) {
-        String sqlQuery = "SELECT ID, NAME FROM SCHEMA.RATING WHERE ID = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, map::mapRowToRating, id));
+    public Rating getRating(Integer id) {
+        try {
+            String sqlQuery = "SELECT ID, NAME FROM SCHEMA.RATING WHERE ID = ?";
+            return jdbcTemplate.queryForObject(sqlQuery, map::mapRowToRating, id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NoSuchElementException("Указанный рейтинг отсутствует." + e.getMessage());
+        }
     }
 
     @Override

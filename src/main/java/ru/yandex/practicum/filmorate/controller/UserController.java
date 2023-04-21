@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
@@ -9,6 +8,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.service.util.ValidateService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")
-    void addFriend(@PathVariable("id") Integer id, @PathVariable("friendId") Integer friendId) {
+    void addFriend(@Positive @PathVariable("id") @Positive Integer id, @PathVariable("friendId") Integer friendId) {
         userService.addFriend(userService.getUserById(id), userService.getUserById(friendId));
     }
 

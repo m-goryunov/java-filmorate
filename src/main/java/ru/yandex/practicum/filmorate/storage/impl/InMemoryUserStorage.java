@@ -22,17 +22,12 @@ public class InMemoryUserStorage implements UserStorage {
     private Integer id = 0;
 
     @Override
-    public void addFriend(User user, User otherUser, boolean friendshipStatus) {
+    public void addFriend(User user, User otherUser) {
         throw new UnsupportedOperationException("Реализация существует только при работе с БД");
     }
 
     @Override
     public void removeFriend(User user, User otherUser) {
-        throw new UnsupportedOperationException("Реализация существует только при работе с БД");
-    }
-
-    @Override
-    public boolean checkFriendship(User user, User otherUser) {
         throw new UnsupportedOperationException("Реализация существует только при работе с БД");
     }
 
@@ -60,13 +55,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public void updateUser(User user) {
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
             log.info("Пользователь обновлён.{}", user.getId());
         } else {
             throw new EntityNotFoundException("Пользователь не существует.", getClass().toString());
         }
-        return user;
     }
 }

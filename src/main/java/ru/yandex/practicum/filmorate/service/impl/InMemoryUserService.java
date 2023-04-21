@@ -37,7 +37,8 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public User updateUser(User user) {
-        return storage.updateUser(user);
+        storage.updateUser(user);
+        return user;
     }
 
     @Override

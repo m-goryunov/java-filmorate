@@ -24,13 +24,13 @@ public interface FilmStorage {
 
     List<Film> getMostPopularFilms(Integer count);
 
-    Optional<Genre> getGenre(Integer id);
+    Genre getGenre(Integer id);
 
     List<Genre> getFilmGenre(Integer id);
 
     List<Genre> getAllFilmGenre();
 
-    Optional<Rating> getRating(Integer id);
+    Rating getRating(Integer id);
 
     List<Rating> getAllRatings();
 }

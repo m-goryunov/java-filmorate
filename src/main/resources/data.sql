@@ -1,6 +1,11 @@
-/*
-insert into SCHEMA.RATING (ID, NAME) values ( 1, 'G' );
-insert into SCHEMA.RATING (ID, NAME) values ( 2, 'PG' );
-insert into SCHEMA.RATING (ID, NAME) values ( 3, 'PG-13' );
-insert into SCHEMA.RATING (ID, NAME) values ( 4, 'R' );
-insert into SCHEMA.RATING (ID, NAME) values ( 5, 'NC-17' );*/
+INSERT INTO SCHEMA.RATING (ID, NAME) values ( 1, 'G' );
+INSERT INTO SCHEMA.RATING (ID, NAME) values ( 2, 'PG' );
+INSERT INTO SCHEMA.RATING (ID, NAME) values ( 3, 'PG-13' );
+INSERT INTO SCHEMA.RATING (ID, NAME) values ( 4, 'R' );
+INSERT INTO SCHEMA.RATING (ID, NAME) values ( 5, 'NC-17' );
+INSERT INTO SCHEMA.GENRE (ID, NAME) values ( 1, 'Комедия' );
+INSERT INTO SCHEMA.GENRE (ID, NAME) values ( 2, 'Драма' );
+INSERT INTO SCHEMA.GENRE (ID, NAME) values ( 3, 'Мультфильм' );
+INSERT INTO SCHEMA.GENRE (ID, NAME) values ( 4, 'Триллер' );
+INSERT INTO SCHEMA.GENRE (ID, NAME) values ( 5, 'Документальный' );
+INSERT INTO SCHEMA.GENRE (ID, NAME) values ( 6, 'Боевик' );

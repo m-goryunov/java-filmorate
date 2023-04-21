@@ -7,11 +7,9 @@ import java.util.Optional;
 
 public interface UserStorage {
 
-    void addFriend(User user, User otherUser, boolean friendshipStatus);
+    void addFriend(User user, User otherUser);
 
     void removeFriend(User user, User otherUser);
-
-    boolean checkFriendship(User user, User otherUser);
 
     List<User> getFriendsList(User user);
 
@@ -21,5 +19,5 @@ public interface UserStorage {
 
     User createUser(User user);
 
-    User updateUser(User user);
+    void updateUser(User user);
 }

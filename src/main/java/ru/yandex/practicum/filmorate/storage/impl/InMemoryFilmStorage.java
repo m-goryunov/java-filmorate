@@ -67,7 +67,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Genre> getGenre(Integer id) {
+    public Genre getGenre(Integer id) {
         throw new UnsupportedOperationException("Реализация существует только при работе с БД");
     }
 
@@ -82,7 +82,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Rating> getRating(Integer id) {
+    public Rating getRating(Integer id) {
         throw new UnsupportedOperationException("Реализация существует только при работе с БД");
     }
 

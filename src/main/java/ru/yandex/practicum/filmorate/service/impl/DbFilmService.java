@@ -64,8 +64,7 @@ public class DbFilmService implements FilmService {
 
     @Override
     public Genre getGenre(Integer id) {
-        return storage.getGenre(id).orElseThrow(() ->
-                new EntityNotFoundException("Жанр не найден.", getClass().toString()));
+        return storage.getGenre(id);
     }
 
     @Override
@@ -80,8 +79,7 @@ public class DbFilmService implements FilmService {
 
     @Override
     public Rating getRating(Integer id) {
-        return storage.getRating(id).orElseThrow(() ->
-                new EntityNotFoundException("Рейтинг не найден.", getClass().toString()));
+        return storage.getRating(id);
     }
 
     @Override

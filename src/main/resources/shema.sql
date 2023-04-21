@@ -12,13 +12,13 @@ create table IF NOT EXISTS FILM
 
 create table IF NOT EXISTS RATING
 (
-    ID   INTEGER,
+    ID   INTEGER NOT NULL PRIMARY KEY,
     NAME VARCHAR,
     constraint rating_pk
         primary key (ID)
 );
 
-ALTER TABLE RATING ALTER COLUMN ID RESTART WITH 1;
+--ALTER TABLE RATING ALTER COLUMN ID RESTART WITH 1;
 
 alter table FILM
     alter column ID BIGINT auto_increment;
@@ -66,8 +66,7 @@ create table IF NOT EXISTS FILM_GENRE
 create table if not exists USER_FRIENDS
 (
     USER_ID INTEGER,
-    FRIEND_ID  LONG,
-    FRIENDSHIP_STATUS BOOLEAN,
+    FRIEND_ID  INTEGER,
     constraint "friend_FILMORATE_USER_ID_fk"
         foreign key (USER_ID) references USER_FILMORATE,
     constraint "friend_FILMORATE_USER_ID_fk2"

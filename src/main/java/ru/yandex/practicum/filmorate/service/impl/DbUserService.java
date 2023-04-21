@@ -24,18 +24,12 @@ public class DbUserService implements UserService {
 
     @Override
     public void addFriend(User user, User otherUser) {
-        storage.addFriend(user, otherUser, true);
-        if (storage.checkFriendship(otherUser, user)) {
-            storage.addFriend(otherUser, user, true);
-        }
+        storage.addFriend(user, otherUser);
     }
 
     @Override
     public void removeFriend(User user, User otherUser) {
         storage.removeFriend(user, otherUser);
-        if (storage.checkFriendship(otherUser, user)) {
-            storage.addFriend(otherUser, user, false); // возможно не сработает
-        }
     }
 
     @Override
@@ -69,6 +63,7 @@ public class DbUserService implements UserService {
 
     @Override
     public User updateUser(User user) {
-        return storage.updateUser(user);
+        storage.updateUser(user);
+        return getUserById(user.getId());
     }
 }

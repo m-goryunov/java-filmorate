@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Generated;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.*;
@@ -28,7 +27,6 @@ public class User {
     private String name;
     @JsonIgnore
     private final Set<Integer> friends = new HashSet<>();
-    private boolean isFriendRequestAccepted;
 
     public void addFriend(User user) {
         friends.add(user.getId());
