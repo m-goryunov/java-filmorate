@@ -77,8 +77,8 @@ public class DbUserStorage implements UserStorage {
     @Override
     public User createUser(User user) {
         log.info("Попытка добавить пользователя");
-        String sqlQuery = "insert into SCHEMA.USER_FILMORATE(EMAIL, LOGIN, BIRTHDAY, NAME) " +
-                "values (?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO SCHEMA.USER_FILMORATE(EMAIL, LOGIN, BIRTHDAY, NAME) " +
+                "VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"ID"});
@@ -97,9 +97,9 @@ public class DbUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         log.info("Попытка обновить пользователя id: {}", user.getId());
-        String sqlQuery = "update SCHEMA.USER_FILMORATE set " +
+        String sqlQuery = "UPDATE SCHEMA.USER_FILMORATE SET " +
                 "EMAIL = ?, LOGIN = ?, BIRTHDAY = ?, NAME = ? " +
-                "where ID = ?";
+                "WHERE ID = ?";
         jdbcTemplate.update(sqlQuery
                 , user.getEmail()
                 , user.getLogin()

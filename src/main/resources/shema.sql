@@ -18,6 +18,8 @@ create table IF NOT EXISTS RATING
         primary key (ID)
 );
 
+ALTER TABLE RATING ALTER COLUMN ID RESTART WITH 1;
+
 alter table FILM
     alter column ID BIGINT auto_increment;
 
@@ -46,6 +48,8 @@ create table IF NOT EXISTS GENRE
     constraint GENRE_PK
         primary key (ID)
 );
+
+ALTER TABLE GENRE ALTER COLUMN ID RESTART WITH 1;
 
 create table IF NOT EXISTS FILM_GENRE
 (
@@ -79,5 +83,4 @@ create table if not exists FILM_LIKES
     constraint "user_film_likes_FILM_ID_fk"
         foreign key (FILM_ID) references FILM
 );
-
 

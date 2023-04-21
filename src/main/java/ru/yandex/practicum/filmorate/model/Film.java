@@ -28,7 +28,7 @@ public class Film {
     @JsonIgnore
     private final Set<Integer> likes = new HashSet<>();
     private List<Genre> genre;
-    private Rating rating;
+    private Rating mpa;
 
     public void addLike(Integer id) {
         likes.add(id);

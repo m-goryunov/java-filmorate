@@ -21,7 +21,7 @@ public class SqlMapper {
                 .description(resultSet.getString("DESCRIPTION"))
                 .duration(resultSet.getInt("DURATION"))
                 .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
-                .rating(Rating.builder().id(resultSet.getInt("RATING_ID")).name(resultSet.getString("RATING_NAME")).build())
+                .mpa(Rating.builder().id(resultSet.getInt("ID")).name(resultSet.getString("NAME")).build())
                 .genre(new ArrayList<>())
                 .build();
     }

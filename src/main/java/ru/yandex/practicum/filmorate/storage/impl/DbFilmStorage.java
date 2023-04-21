@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -39,15 +40,19 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public Optional<Film> getFilmById(Integer id) {
-        String sqlQuery = "SELECT FILM.ID, FILM.NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID, r.NAME " +
-                "FROM SCHEMA.FILM " +
-                "JOIN SCHEMA.RATING AS r ON r.ID = FILM.RATING_ID " +
-                "WHERE FILM.ID = ?";
-        Film film = jdbcTemplate.queryForObject(sqlQuery, map::mapRowToFilm, id);
-        assert film != null;
-        film.setGenre(getFilmGenre(film.getId()));
+        try {
+            String sqlQuery = "SELECT FILM.ID, FILM.NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID, r.NAME " +
+                    "FROM SCHEMA.FILM " +
+                    "JOIN SCHEMA.RATING AS r ON r.ID = FILM.RATING_ID " +
+                    "WHERE FILM.ID = ?";
+            Film film = jdbcTemplate.queryForObject(sqlQuery, map::mapRowToFilm, id);
+            assert film != null;
+            film.setGenre(getFilmGenre(film.getId()));
 
-        return Optional.of(film);
+            return Optional.of(film);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NoSuchElementException("Фильм не существует." + e.getMessage());
+        }
     }
 
     @Override
@@ -62,16 +67,16 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        String sqlQuery = "insert into FILM(NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID) " +
-                "values (?, ?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO SCHEMA.FILM(RATING_ID, NAME, DESCRIPTION, DURATION, RELEASE_DATE) " +
+                "VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
-            stmt.setString(1, film.getName());
-            stmt.setString(2, film.getDescription());
-            stmt.setLong(3, film.getDuration());
-            stmt.setDate(4, Date.valueOf(film.getReleaseDate()));
-            stmt.setInt(5, film.getRating().getId());
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"ID"});
+            stmt.setInt(1, film.getMpa().getId());
+            stmt.setString(2, film.getName());
+            stmt.setString(3, film.getDescription());
+            stmt.setLong(4, film.getDuration());
+            stmt.setDate(5, Date.valueOf(film.getReleaseDate()));
             return stmt;
         }, keyHolder);
 
@@ -84,12 +89,12 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        String sqlQuery = "UPDATE FILM SET " +
+        String sqlQuery = "UPDATE SCHEMA.FILM SET " +
                 "NAME = ?, DESCRIPTION = ?, DURATION = ?, RELEASE_DATE = ?, RATING_ID = ?" +
                 "WHERE id = ?";
-        String deleteSqlQuery = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
+        String deleteSqlQuery = "DELETE FROM SCHEMA.FILM_GENRE WHERE FILM_ID = ?";
         int rows = jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getDuration(),
-                film.getReleaseDate(), film.getRating().getId(), film.getId());
+                film.getReleaseDate(), film.getMpa().getId(), film.getId());
         if (rows == 0) {
             throw new EntityNotFoundException("Обновление несуществующего фильма.", getClass().toString());
         }
@@ -122,7 +127,7 @@ public class DbFilmStorage implements FilmStorage {
                 " FROM SCHEMA.FILM_LIKES " +
                 " GROUP BY FILM_ID) LIKES " +
                 " ON LIKES.FILM_ID = FILM.ID " +
-                " JOIN RATING AS r ON r.ID = FILM.RATING_ID " +
+                " JOIN SCHEMA.RATING AS r ON r.ID = FILM.RATING_ID " +
                 " ORDER BY LIKES DESC LIMIT ?;";
 
         List<Film> films = jdbcTemplate.query(sqlQuery, map::mapRowToFilm, count);
@@ -150,7 +155,7 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Genre> getAllFilmGenre() {
-        String sqlQuery = "select ID, NAME from SCHEMA.GENRE";
+        String sqlQuery = "SELECT ID, NAME FROM SCHEMA.GENRE";
         return jdbcTemplate.query(sqlQuery, map::mapRowToGenre);
     }
 
@@ -167,19 +172,19 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     private void setFilmGenre(List<Film> films) {
-        String sqlQueryGenres =
-                "SELECT FILM_ID, g.ID AS genre_id, g.NAME AS genre_name " +
+        String sqlQuery =
+                "SELECT FILM_ID, g.ID AS genre_id, g.NAME " +
                         "FROM SCHEMA.FILM_GENRE AS fg " +
-                        "JOIN GENRE g ON g.ID = fg.GENRE_ID " +
+                        "JOIN SCHEMA.GENRE g ON g.ID = fg.GENRE_ID " +
                         "WHERE FILM_ID IN (:ids)";
 
         Set<Integer> ids = films.stream().map(Film::getId).collect(Collectors.toSet());
         SqlParameterSource p = new MapSqlParameterSource("ids", ids);
-        namedParam.query(sqlQueryGenres, p, (rs, rn) -> map.mapRowToFilmsWithGenres(rs, rn, films));
+        namedParam.query(sqlQuery, p, (rs, rn) -> map.mapRowToFilmsWithGenres(rs, rn, films));
     }
 
     private void setFilmGenre(Integer filmId, List<Genre> genre) {
-        String sql = "INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) " +
+        String sql = "INSERT INTO SCHEMA.FILM_GENRE (FILM_ID, GENRE_ID) " +
                 "VALUES (?, ?)";
         try {
             jdbcTemplate.batchUpdate(sql, genre, 2,
