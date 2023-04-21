@@ -101,12 +101,12 @@ public class DbUserStorage implements UserStorage {
         String sqlQuery = "UPDATE SCHEMA.USER_FILMORATE SET " +
                 "EMAIL = ?, LOGIN = ?, BIRTHDAY = ?, NAME = ? " +
                 "WHERE ID = ?";
-        int rows = jdbcTemplate.update(sqlQuery
-                , user.getEmail()
-                , user.getLogin()
-                , user.getBirthday()
-                , user.getName()
-                , user.getId());
+        int rows = jdbcTemplate.update(sqlQuery,
+                user.getEmail(),
+                user.getLogin(),
+                user.getBirthday(),
+                user.getName(),
+                user.getId());
         if (rows == 0) {
             throw new NoSuchElementException("Пользователь не существует.");
         }
