@@ -23,12 +23,12 @@ import java.util.Optional;
 public class DbUserStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final SqlMapper map;
+    private final SqlMapper mapper;
 
     @Autowired
-    public DbUserStorage(JdbcTemplate jdbcTemplate, SqlMapper map) {
+    public DbUserStorage(JdbcTemplate jdbcTemplate, SqlMapper mapper) {
         this.jdbcTemplate = jdbcTemplate;
-        this.map = map;
+        this.mapper = mapper;
     }
 
     @Override
@@ -54,13 +54,13 @@ public class DbUserStorage implements UserStorage {
                 "WHERE ID IN" +
                 "(SELECT FRIEND_ID FROM SCHEMA.USER_FRIENDS WHERE USER_ID = ?)";
 
-        return jdbcTemplate.query(sql, map::mapRowToUser, user.getId());
+        return jdbcTemplate.query(sql, mapper::mapRowToUser, user.getId());
     }
 
     @Override
     public List<User> getAllUsers() {
         String sqlQuery = "SELECT * FROM SCHEMA.USER_FILMORATE";
-        return jdbcTemplate.query(sqlQuery, map::mapRowToUser);
+        return jdbcTemplate.query(sqlQuery, mapper::mapRowToUser);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class DbUserStorage implements UserStorage {
             String sqlQuery = "SELECT ID, EMAIL, LOGIN, BIRTHDAY,NAME " +
                     "FROM SCHEMA.USER_FILMORATE " +
                     "WHERE ID = ?";
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, map::mapRowToUser, id));
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, mapper::mapRowToUser, id));
         } catch (Exception e) {
             throw new EntityNotFoundException("Ошибка при получении пользователя", e.getMessage());
         }
