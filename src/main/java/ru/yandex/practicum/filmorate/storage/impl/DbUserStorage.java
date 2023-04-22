@@ -33,14 +33,14 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public void addFriend(User user, User otherUser) {
-        String sqlQuery = "INSERT INTO SCHEMA.USER_FRIENDS (USER_ID, FRIEND_ID) " +
+        String sqlQuery = "INSERT INTO USER_FRIENDS (USER_ID, FRIEND_ID) " +
                 "VALUES (?, ?)";
         jdbcTemplate.update(sqlQuery, user.getId(), otherUser.getId());
     }
 
     @Override
     public void removeFriend(User user, User otherUser) {
-        String sqlQuery = "DELETE FROM SCHEMA.USER_FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
+        String sqlQuery = "DELETE FROM USER_FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
         int rows = jdbcTemplate.update(sqlQuery, user.getId(), otherUser.getId());
         if (rows == 0) {
             throw new NoSuchElementException("Друг отсутствует.");
@@ -50,16 +50,16 @@ public class DbUserStorage implements UserStorage {
     @Override
     public List<User> getFriendsList(User user) {
         String sql = "SELECT ID, NAME, LOGIN, EMAIL, BIRTHDAY " +
-                "FROM SCHEMA.USER_FILMORATE " +
+                "FROM USER_FILMORATE " +
                 "WHERE ID IN" +
-                "(SELECT FRIEND_ID FROM SCHEMA.USER_FRIENDS WHERE USER_ID = ?)";
+                "(SELECT FRIEND_ID FROM USER_FRIENDS WHERE USER_ID = ?)";
 
         return jdbcTemplate.query(sql, mapper::mapRowToUser, user.getId());
     }
 
     @Override
     public List<User> getAllUsers() {
-        String sqlQuery = "SELECT * FROM SCHEMA.USER_FILMORATE";
+        String sqlQuery = "SELECT * FROM USER_FILMORATE";
         return jdbcTemplate.query(sqlQuery, mapper::mapRowToUser);
     }
 
@@ -67,7 +67,7 @@ public class DbUserStorage implements UserStorage {
     public Optional<User> getUserById(Integer id) {
         try {
             String sqlQuery = "SELECT ID, EMAIL, LOGIN, BIRTHDAY,NAME " +
-                    "FROM SCHEMA.USER_FILMORATE " +
+                    "FROM USER_FILMORATE " +
                     "WHERE ID = ?";
             return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, mapper::mapRowToUser, id));
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class DbUserStorage implements UserStorage {
     @Override
     public User createUser(User user) {
         log.info("Попытка добавить пользователя");
-        String sqlQuery = "INSERT INTO SCHEMA.USER_FILMORATE(EMAIL, LOGIN, BIRTHDAY, NAME) " +
+        String sqlQuery = "INSERT INTO USER_FILMORATE(EMAIL, LOGIN, BIRTHDAY, NAME) " +
                 "VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -98,7 +98,7 @@ public class DbUserStorage implements UserStorage {
     @Override
     public void updateUser(User user) {
         log.info("Попытка обновить пользователя id: {}", user.getId());
-        String sqlQuery = "UPDATE SCHEMA.USER_FILMORATE SET " +
+        String sqlQuery = "UPDATE USER_FILMORATE SET " +
                 "EMAIL = ?, LOGIN = ?, BIRTHDAY = ?, NAME = ? " +
                 "WHERE ID = ?";
         int rows = jdbcTemplate.update(sqlQuery,
