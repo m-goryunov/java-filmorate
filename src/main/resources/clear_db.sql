@@ -1,14 +1,14 @@
-drop table FILM_GENRE;
+drop table IF EXISTS FILM_GENRE;
 
-drop table FILM_LIKES;
+drop table IF EXISTS FILM_LIKES;
 
-drop table FILM;
+drop table IF EXISTS FILM;
 
-drop table GENRE;
+drop table IF EXISTS GENRE;
 
-drop table RATING;
+drop table IF EXISTS RATING;
 
-drop table USER_FRIENDS;
+drop table IF EXISTS USER_FRIENDS;
 
-drop table USER_FILMORATE;
+drop table IF EXISTS USER_FILMORATE;
 
