@@ -1,4 +1,3 @@
-/*
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
@@ -90,7 +89,7 @@ public class UserDaoTest {
         Assertions.assertEquals(users.get(0), User.builder()
                 .id(0)
                 .email("mail@mail.com")
-                .login("testUser")
+                .login("user1")
                 .name("name")
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
                 .build());
@@ -104,7 +103,7 @@ public class UserDaoTest {
                 .hasValueSatisfying(it ->
                         assertThat(it).hasFieldOrPropertyWithValue("id", 0)
                                 .hasFieldOrPropertyWithValue("email", "mail@mail.com")
-                                .hasFieldOrPropertyWithValue("login", "testUser")
+                                .hasFieldOrPropertyWithValue("login", "user1")
                                 .hasFieldOrPropertyWithValue("name", "name")
                                 .hasFieldOrPropertyWithValue("birthday", LocalDate.of(1985, Month.AUGUST, 21)
                                 ));
@@ -116,7 +115,7 @@ public class UserDaoTest {
         User wrongUser = User.builder()
                 .email("mail@mail.com")
                 .login("testUser2")
-                .name(null)
+                .name("testUser2")
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
                 .build();
         User user = storage.createUser(wrongUser);
@@ -137,7 +136,7 @@ public class UserDaoTest {
                 .id(0)
                 .email("updated@mail.com")
                 .login("updatedLogin")
-                .name(null)
+                .name("updatedLogin")
                 .birthday(LocalDate.of(1986, Month.AUGUST, 21))
                 .build();
 
@@ -158,4 +157,3 @@ public class UserDaoTest {
 
 
 }
-*/

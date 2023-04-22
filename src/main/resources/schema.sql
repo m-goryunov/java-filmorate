@@ -1,4 +1,6 @@
-create table IF NOT EXISTS FILM
+CREATE SCHEMA IF NOT EXISTS "PUBLIC";
+
+CREATE TABLE IF NOT EXISTS FILM
 (
     ID           IDENTITY NOT NULL PRIMARY KEY,
     RATING_ID    INTEGER,
@@ -6,21 +8,21 @@ create table IF NOT EXISTS FILM
     DESCRIPTION  VARCHAR,
     DURATION     INTEGER,
     RELEASE_DATE DATE,
-    constraint FILM_ID
-        primary key (ID)
+    CONSTRAINT FILM_ID
+        PRIMARY KEY (ID)
 );
 
-create table IF NOT EXISTS RATING
+CREATE TABLE IF NOT EXISTS RATING
 (
     RATING_ID   INTEGER NOT NULL PRIMARY KEY,
     RATING_NAME VARCHAR,
-    constraint rating_pk
-        primary key (RATING_ID)
+    CONSTRAINT RATING_PK
+        PRIMARY KEY (RATING_ID)
 );
 
 alter table FILM
-    add constraint if not exists FILM_RATING___FK
-        foreign key (RATING_ID) references RATING
+    ADD CONSTRAINT IF NOT EXISTS FILM_RATING___FK
+        FOREIGN KEY (RATING_ID) REFERENCES RATING
             on update cascade on delete set null;
 
 
@@ -78,26 +80,3 @@ create table if not exists FILM_LIKES
     constraint "user_film_likes_FILM_ID_fk"
         foreign key (FILM_ID) references FILM
 );
-
-INSERT INTO RATING (RATING_ID, RATING_NAME)
-values (1, 'G');
-INSERT INTO RATING (RATING_ID, RATING_NAME)
-values (2, 'PG');
-INSERT INTO RATING (RATING_ID, RATING_NAME)
-values (3, 'PG-13');
-INSERT INTO RATING (RATING_ID, RATING_NAME)
-values (4, 'R');
-INSERT INTO RATING (RATING_ID, RATING_NAME)
-values (5, 'NC-17');
-INSERT INTO GENRE (ID, NAME)
-values (1, 'Комедия');
-INSERT INTO GENRE (ID, NAME)
-values (2, 'Драма');
-INSERT INTO GENRE (ID, NAME)
-values (3, 'Мультфильм');
-INSERT INTO GENRE (ID, NAME)
-values (4, 'Триллер');
-INSERT INTO GENRE (ID, NAME)
-values (5, 'Документальный');
-INSERT INTO GENRE (ID, NAME)
-values (6, 'Боевик');

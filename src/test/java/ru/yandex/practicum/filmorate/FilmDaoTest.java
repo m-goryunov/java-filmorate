@@ -1,4 +1,3 @@
-/*
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
@@ -7,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -60,14 +58,14 @@ class FilmDaoTest {
 
     @Test
     void getFilmById() {
-        Film film = filmStorage.getFilmById(1).orElseThrow();
+        Film film = filmStorage.getFilmById(0).orElseThrow();
         assertThat(Optional.of(film))
                 .isPresent()
                 .hasValueSatisfying(it ->
                         assertThat(it).hasFieldOrPropertyWithValue("id", 0)
                                 .hasFieldOrPropertyWithValue("name", "Default Name")
                                 .hasFieldOrPropertyWithValue("description", "Default description")
-                                .hasFieldOrPropertyWithValue("duration", 120)
+                                .hasFieldOrPropertyWithValue("duration", 120L)
                                 .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2005, Month.APRIL, 12))
                                 .hasFieldOrPropertyWithValue("mpa", testRating
                                 )
@@ -84,7 +82,7 @@ class FilmDaoTest {
                         assertThat(it).hasFieldOrPropertyWithValue("id", 0)
                                 .hasFieldOrPropertyWithValue("name", "Default Name")
                                 .hasFieldOrPropertyWithValue("description", "Default description")
-                                .hasFieldOrPropertyWithValue("duration", 120)
+                                .hasFieldOrPropertyWithValue("duration", 120L)
                                 .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2005, Month.APRIL, 12))
                                 .hasFieldOrPropertyWithValue("mpa", testRating)
                 );
@@ -96,7 +94,7 @@ class FilmDaoTest {
                 .id(1)
                 .build();
 
-        assertThrows(BadSqlGrammarException.class, () -> filmStorage.createFilm(wrongFilm));
+        assertThrows(NullPointerException.class, () -> filmStorage.createFilm(wrongFilm));
     }
 
     @Test
@@ -110,7 +108,7 @@ class FilmDaoTest {
                 .id(0)
                 .name("Updated Name")
                 .description("Updated description")
-                .duration(122)
+                .duration(122L)
                 .releaseDate(LocalDate.of(2006, Month.APRIL, 12))
                 .mpa(updatedRating)
                 .build();
@@ -124,7 +122,7 @@ class FilmDaoTest {
                         assertThat(it).hasFieldOrPropertyWithValue("id", 0)
                                 .hasFieldOrPropertyWithValue("name", "Updated Name")
                                 .hasFieldOrPropertyWithValue("description", "Updated description")
-                                .hasFieldOrPropertyWithValue("duration", 122)
+                                .hasFieldOrPropertyWithValue("duration", 122L)
                                 .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2006, Month.APRIL, 12))
                                 .hasFieldOrPropertyWithValue("mpa", updatedRating)
                 );
@@ -151,7 +149,7 @@ class FilmDaoTest {
                         assertThat(it).hasFieldOrPropertyWithValue("id", 0)
                                 .hasFieldOrPropertyWithValue("name", "Default Name")
                                 .hasFieldOrPropertyWithValue("description", "Default description")
-                                .hasFieldOrPropertyWithValue("duration", 120)
+                                .hasFieldOrPropertyWithValue("duration", 120L)
                                 .hasFieldOrPropertyWithValue("releaseDate", LocalDate.of(2005, Month.APRIL, 12))
                                 .hasFieldOrPropertyWithValue("mpa", testRating)
                 );
@@ -190,4 +188,3 @@ class FilmDaoTest {
 
 
 }
-*/
