@@ -21,8 +21,8 @@ public class SqlMapper {
                 .description(resultSet.getString("DESCRIPTION"))
                 .duration(resultSet.getInt("DURATION"))
                 .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
-                .mpa(Rating.builder().id(resultSet.getInt("ID")).name(resultSet.getString("NAME")).build())
-                .genre(new ArrayList<>())
+                .mpa(Rating.builder().id(resultSet.getInt("RATING_ID")).name(resultSet.getString("RATING_NAME")).build())
+                .genres(new ArrayList<>())
                 .build();
     }
 
@@ -42,19 +42,22 @@ public class SqlMapper {
 
         if (film.isPresent()) {
             List<Genre> genres;
-            if (film.get().getGenre() != null) {
-                genres = film.get().getGenre();
+            if (film.get().getGenres() != null) {
+                genres = film.get().getGenres();
             } else genres = new ArrayList<>();
-            genres.add(Genre.builder().id(resultSet.getInt("GENRE_ID")).name(resultSet.getString("GENRE_NAME")).build());
-            film.get().setGenre(genres);
+            genres.add(Genre.builder()
+                    .id(resultSet.getInt("ID"))
+                    .name(resultSet.getString("NAME"))
+                    .build());
+            film.get().setGenres(genres);
         }
         return null;
     }
 
     public Rating mapRowToRating(ResultSet resultSet, int rowNum) throws SQLException {
         return Rating.builder()
-                .id(resultSet.getInt("ID"))
-                .name(resultSet.getString("NAME"))
+                .id(resultSet.getInt("RATING_ID"))
+                .name(resultSet.getString("RATING_NAME"))
                 .build();
     }
 

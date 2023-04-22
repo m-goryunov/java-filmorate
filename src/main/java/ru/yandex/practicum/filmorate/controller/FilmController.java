@@ -69,8 +69,8 @@ public class FilmController {
     }
 
     @GetMapping("/genres/{id}")
-    List<Genre> getGenreById(@Positive @NotNull @PathVariable Integer id) {
-        return filmService.getFilmGenre(id);
+    Genre getGenreById(@Positive @NotNull @PathVariable Integer id) {
+        return filmService.getGenreById(id);
     }
 
     @GetMapping("/mpa")

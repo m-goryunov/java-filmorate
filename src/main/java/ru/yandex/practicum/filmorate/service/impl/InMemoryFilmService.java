@@ -66,7 +66,7 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public Genre getGenre(Integer id) {
+    public Genre getGenreById(Integer id) {
         throw new UnsupportedOperationException("Реализация существует только при работе с БД");
     }
 

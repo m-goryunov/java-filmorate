@@ -63,8 +63,8 @@ public class DbFilmService implements FilmService {
     }
 
     @Override
-    public Genre getGenre(Integer id) {
-        return storage.getGenre(id);
+    public Genre getGenreById(Integer id) {
+        return storage.getGenreById(id);
     }
 
     @Override

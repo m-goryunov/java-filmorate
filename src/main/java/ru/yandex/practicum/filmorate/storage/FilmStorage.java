@@ -24,7 +24,7 @@ public interface FilmStorage {
 
     List<Film> getMostPopularFilms(Integer count);
 
-    Genre getGenre(Integer id);
+    Genre getGenreById(Integer id);
 
     List<Genre> getFilmGenre(Integer id);
 

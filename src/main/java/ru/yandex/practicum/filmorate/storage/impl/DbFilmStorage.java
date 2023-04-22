@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -41,13 +42,14 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public Optional<Film> getFilmById(Integer id) {
         try {
-            String sqlQuery = "SELECT FILM.ID, FILM.NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID, r.NAME " +
+            String sqlQuery = "SELECT FILM.ID, FILM.NAME, DESCRIPTION, DURATION, RELEASE_DATE," +
+                    " SCHEMA.FILM.RATING_ID, r.RATING_NAME " +
                     "FROM SCHEMA.FILM " +
-                    "JOIN SCHEMA.RATING AS r ON r.ID = FILM.RATING_ID " +
-                    "WHERE FILM.ID = ?";
+                    "JOIN SCHEMA.RATING AS r ON r.RATING_ID = SCHEMA.FILM.RATING_ID " +
+                    "WHERE SCHEMA.FILM.ID = ?";
             Film film = jdbcTemplate.queryForObject(sqlQuery, map::mapRowToFilm, id);
             assert film != null;
-            film.setGenre(getFilmGenre(film.getId()));
+            film.setGenres(getFilmGenre(film.getId()));
 
             return Optional.of(film);
         } catch (EmptyResultDataAccessException e) {
@@ -57,9 +59,9 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        String sqlQuery = "SELECT FILM.ID, FILM.NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID, r.NAME " +
+        String sqlQuery = "SELECT FILM.ID, FILM.NAME, DESCRIPTION, DURATION, RELEASE_DATE, SCHEMA.FILM.RATING_ID, r.RATING_NAME " +
                 "FROM SCHEMA.FILM " +
-                "JOIN SCHEMA.RATING AS r ON r.ID = FILM.RATING_ID ";
+                "JOIN SCHEMA.RATING AS r ON r.RATING_ID = FILM.RATING_ID ";
         List<Film> films = jdbcTemplate.query(sqlQuery, map::mapRowToFilm);
         setFilmGenre(films);
         return films; // ??
@@ -81,8 +83,8 @@ public class DbFilmStorage implements FilmStorage {
         }, keyHolder);
 
         film.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
-        if (film.getGenre() != null) {
-            setFilmGenre(film.getId(), film.getGenre());
+        if (film.getGenres() != null) {
+            setFilmGenre(film.getId(), film.getGenres());
         }
         return film;
     }
@@ -103,36 +105,51 @@ public class DbFilmStorage implements FilmStorage {
         if (rows == 0) {
             throw new EntityNotFoundException("Обновление несуществующего фильма.", getClass().toString());
         }
-        if (film.getGenre() == null) {
+        if (film.getGenres() == null) {
             jdbcTemplate.update(deleteSqlQuery, film.getId());
         } else {
             jdbcTemplate.update(deleteSqlQuery, film.getId());
-            setFilmGenre(film.getId(), film.getGenre());
-            film.setGenre(getFilmGenre(film.getId()));
+            setFilmGenre(film.getId(), film.getGenres());
+            film.setGenres(getFilmGenre(film.getId()));
         }
         return film;
     }
 
     @Override
     public void addLike(Film film, User user) {
-
+        try {
+            String sqlQuery = "INSERT INTO SCHEMA.FILM_LIKES (FILM_ID, USER_ID_LIKE) " +
+                    "VALUES (?, ?)";
+            jdbcTemplate.update(sqlQuery,
+                    film.getId(),
+                    user.getId());
+        } catch (DataIntegrityViolationException e) {
+            throw new NoSuchElementException("Ошибка при добавлении лайка. " + e.getMessage());
+        }
     }
 
     @Override
     public void deleteLike(Film film, User user) {
-
+        String sqlQuery = "DELETE FROM SCHEMA.FILM_LIKES " +
+                "WHERE USER_ID_LIKE = ? AND FILM_ID = ?";
+        int rows = jdbcTemplate.update(sqlQuery,
+                user.getId(),
+                film.getId());
+        if (rows == 0) {
+            throw new NoSuchElementException("Отсутствует лайк для удаления.");
+        }
     }
 
     @Override
     public List<Film> getMostPopularFilms(Integer count) {
-        String sqlQuery = "SELECT FILM.ID, FILM.NAME, DESCRIPTION, DURATION, RELEASE_DATE, RATING_ID," +
-                "r.NAME AS RATING_NAME, LIKES.LIKES " +
+        String sqlQuery = "SELECT FILM.ID, FILM.NAME, DESCRIPTION, DURATION, RELEASE_DATE, FILM.RATING_ID," +
+                "r.RATING_NAME AS RATING_NAME, LIKES.LIKES " +
                 "FROM SCHEMA.FILM" +
                 " LEFT JOIN (SELECT FILM_ID, COUNT(*) AS LIKES" +
                 " FROM SCHEMA.FILM_LIKES " +
                 " GROUP BY FILM_ID) LIKES " +
                 " ON LIKES.FILM_ID = FILM.ID " +
-                " JOIN SCHEMA.RATING AS r ON r.ID = FILM.RATING_ID " +
+                " JOIN SCHEMA.RATING AS r ON r.RATING_ID = FILM.RATING_ID " +
                 " ORDER BY LIKES DESC LIMIT ?;";
 
         List<Film> films = jdbcTemplate.query(sqlQuery, map::mapRowToFilm, count);
@@ -141,7 +158,7 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Genre getGenre(Integer id) {
+    public Genre getGenreById(Integer id) {
         try {
             String sqlQuery = "SELECT ID, NAME FROM SCHEMA.GENRE WHERE ID = ?";
             return jdbcTemplate.queryForObject(sqlQuery, map::mapRowToGenre, id);
@@ -171,7 +188,7 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public Rating getRating(Integer id) {
         try {
-            String sqlQuery = "SELECT ID, NAME FROM SCHEMA.RATING WHERE ID = ?";
+            String sqlQuery = "SELECT RATING_ID, RATING_NAME FROM SCHEMA.RATING WHERE RATING_ID = ?";
             return jdbcTemplate.queryForObject(sqlQuery, map::mapRowToRating, id);
         } catch (EmptyResultDataAccessException e) {
             throw new NoSuchElementException("Указанный рейтинг отсутствует." + e.getMessage());
@@ -180,7 +197,7 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Rating> getAllRatings() {
-        String sqlQuery = "SELECT ID, NAME FROM SCHEMA.RATING";
+        String sqlQuery = "SELECT RATING_ID, RATING_NAME FROM SCHEMA.RATING";
         return jdbcTemplate.query(sqlQuery, map::mapRowToRating);
     }
 

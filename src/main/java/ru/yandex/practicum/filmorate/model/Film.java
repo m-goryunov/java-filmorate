@@ -27,7 +27,7 @@ public class Film {
     private long duration;
     @JsonIgnore
     private final Set<Integer> likes = new HashSet<>();
-    private List<Genre> genre;
+    private List<Genre> genres;
     private Rating mpa;
 
     public void addLike(Integer id) {

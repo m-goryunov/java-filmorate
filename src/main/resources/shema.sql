@@ -3,7 +3,7 @@ create table IF NOT EXISTS FILM
     ID           IDENTITY NOT NULL PRIMARY KEY,
     RATING_ID    INTEGER,
     NAME         VARCHAR NOT NULL,
-    DESCRIPTION  TEXT,
+    DESCRIPTION  VARCHAR,
     DURATION     INTEGER,
     RELEASE_DATE DATE,
     constraint FILM_ID
@@ -12,16 +12,16 @@ create table IF NOT EXISTS FILM
 
 create table IF NOT EXISTS RATING
 (
-    ID   INTEGER NOT NULL PRIMARY KEY,
-    NAME VARCHAR,
+    RATING_ID   INTEGER NOT NULL PRIMARY KEY,
+    RATING_NAME VARCHAR,
     constraint rating_pk
-        primary key (ID)
+        primary key (RATING_ID)
 );
 
 --ALTER TABLE RATING ALTER COLUMN ID RESTART WITH 1;
 
-alter table FILM
-    alter column ID BIGINT auto_increment;
+/*alter table FILM
+    alter column ID BIGINT auto_increment;*/
 
 alter table FILM
     add constraint if not exists FILM_RATING___FK
@@ -76,7 +76,7 @@ create table if not exists USER_FRIENDS
 create table if not exists FILM_LIKES
 (
     FILM_ID INTEGER NOT NULL,
-    USER_ID_LIKE LONG NOT NULL,
+    USER_ID_LIKE INTEGER NOT NULL,
     constraint "user_film_likes_FILMORATE_USER_ID_fk"
         foreign key (USER_ID_LIKE) references USER_FILMORATE,
     constraint "user_film_likes_FILM_ID_fk"
