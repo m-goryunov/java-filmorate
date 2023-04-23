@@ -5,14 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.service.util.ValidateService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
@@ -59,30 +56,8 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    List<Film> getMostPopularFilmsCount(@Positive @NotNull @RequestParam(defaultValue = "10") Integer count) {
+    List<Film> getMostPopularFilmsCount(@Positive @RequestParam(defaultValue = "10") Integer count) {
         return filmService.getMostPopularFilms(count);
     }
-
-    @GetMapping("/genres")
-    List<Genre> getAllGenres() {
-        return filmService.getAllFilmGenre();
-    }
-
-    @GetMapping("/genres/{id}")
-    Genre getGenreById(@Positive @NotNull @PathVariable Integer id) {
-        return filmService.getGenreById(id);
-    }
-
-    @GetMapping("/mpa")
-    List<Rating> getAllRatings() {
-        return filmService.getAllRatings();
-    }
-
-    @GetMapping("/mpa/{id}")
-    Rating getRatingById(@Positive @NotNull @PathVariable Integer id) {
-        return filmService.getRating(id);
-    }
-
-
 }
 

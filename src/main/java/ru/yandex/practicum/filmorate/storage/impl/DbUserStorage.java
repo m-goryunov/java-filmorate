@@ -32,32 +32,6 @@ public class DbUserStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(User user, User otherUser) {
-        String sqlQuery = "INSERT INTO USER_FRIENDS (USER_ID, FRIEND_ID) " +
-                "VALUES (?, ?)";
-        jdbcTemplate.update(sqlQuery, user.getId(), otherUser.getId());
-    }
-
-    @Override
-    public void removeFriend(User user, User otherUser) {
-        String sqlQuery = "DELETE FROM USER_FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
-        int rows = jdbcTemplate.update(sqlQuery, user.getId(), otherUser.getId());
-        if (rows == 0) {
-            throw new NoSuchElementException("Друг отсутствует.");
-        }
-    }
-
-    @Override
-    public List<User> getFriendsList(User user) {
-        String sql = "SELECT ID, NAME, LOGIN, EMAIL, BIRTHDAY " +
-                "FROM USER_FILMORATE " +
-                "WHERE ID IN" +
-                "(SELECT FRIEND_ID FROM USER_FRIENDS WHERE USER_ID = ?)";
-
-        return jdbcTemplate.query(sql, mapper::mapRowToUser, user.getId());
-    }
-
-    @Override
     public List<User> getAllUsers() {
         String sqlQuery = "SELECT * FROM USER_FILMORATE";
         return jdbcTemplate.query(sqlQuery, mapper::mapRowToUser);
@@ -112,5 +86,4 @@ public class DbUserStorage implements UserStorage {
         }
         log.info("Пользователь обновлён. id: {}", user.getId());
     }
-
 }

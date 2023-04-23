@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -11,20 +9,27 @@ import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.RatingStorage;
 
 import java.util.List;
 
 @Service
-@Primary
 @Slf4j
 public class DbFilmService implements FilmService {
 
-    FilmStorage storage;
+    private final FilmStorage storage;
+    private final LikeStorage likeStorage;
+    private final GenreStorage genreStorage;
+    private final RatingStorage ratingStorage;
 
-    public DbFilmService(@Qualifier("dbFilmStorage") FilmStorage storage) {
+    public DbFilmService(FilmStorage storage, LikeStorage likeStorage, GenreStorage genreStorage, RatingStorage ratingStorage) {
         this.storage = storage;
+        this.likeStorage = likeStorage;
+        this.genreStorage = genreStorage;
+        this.ratingStorage = ratingStorage;
     }
-
 
     @Override
     public Film getFilmById(Integer id) {
@@ -49,12 +54,12 @@ public class DbFilmService implements FilmService {
 
     @Override
     public void addLike(Film film, User user) {
-        storage.addLike(film, user);
+        likeStorage.addLike(film, user);
     }
 
     @Override
     public void deleteLike(Film film, User user) {
-        storage.deleteLike(film, user);
+        likeStorage.deleteLike(film, user);
     }
 
     @Override
@@ -64,26 +69,26 @@ public class DbFilmService implements FilmService {
 
     @Override
     public Genre getGenreById(Integer id) {
-        return storage.getGenreById(id);
+        return genreStorage.getGenreById(id);
     }
 
     @Override
     public List<Genre> getFilmGenre(Integer id) {
-        return storage.getFilmGenre(id);
+        return genreStorage.getFilmGenre(id);
     }
 
     @Override
     public List<Genre> getAllFilmGenre() {
-        return storage.getAllFilmGenre();
+        return genreStorage.getAllFilmGenre();
     }
 
     @Override
     public Rating getRating(Integer id) {
-        return storage.getRating(id);
+        return ratingStorage.getRating(id);
     }
 
     @Override
     public List<Rating> getAllRatings() {
-        return storage.getAllRatings();
+        return ratingStorage.getAllRatings();
     }
 }

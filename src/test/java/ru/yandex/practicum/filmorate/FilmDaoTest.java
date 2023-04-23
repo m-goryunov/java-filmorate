@@ -13,6 +13,9 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.impl.DbFilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.DbGenreStorage;
+import ru.yandex.practicum.filmorate.storage.impl.DbLikeStorage;
+import ru.yandex.practicum.filmorate.storage.impl.DbRatingStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -33,6 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class FilmDaoTest {
 
     private final DbFilmStorage filmStorage;
+    private final DbLikeStorage likeStorage;
+    private final DbGenreStorage genreStorage;
+    private final DbRatingStorage ratingStorage;
 
     Rating testRating = Rating.builder()
             .id(1)
@@ -130,13 +136,13 @@ class FilmDaoTest {
 
     @Test
     void addLike() {
-        filmStorage.addLike(testFilm, testUser);
+        likeStorage.addLike(testFilm, testUser);
     }
 
     @Test
     void deleteLike() {
-        filmStorage.addLike(testFilm, testUser);
-        filmStorage.deleteLike(testFilm, testUser);
+        likeStorage.addLike(testFilm, testUser);
+        likeStorage.deleteLike(testFilm, testUser);
     }
 
     @Test
@@ -157,34 +163,33 @@ class FilmDaoTest {
 
     @Test
     void getGenreById() {
-        Genre genre = filmStorage.getGenreById(1);
+        Genre genre = genreStorage.getGenreById(1);
         Assertions.assertEquals(Genre.builder().id(1).name("Комедия").build(), genre);
     }
 
     @Test
     void getFilmGenre() {
-        filmStorage.getFilmGenre(0);
+        genreStorage.getFilmGenre(0);
     }
 
     @Test
     void getAllFilmGenre() {
-        List<Genre> genres = filmStorage.getAllFilmGenre();
+        List<Genre> genres = genreStorage.getAllFilmGenre();
         Assertions.assertEquals(6, genres.size());
         Assertions.assertEquals(genres.get(0), Genre.builder().id(1).name("Комедия").build());
     }
 
     @Test
     void getRating() {
-        Rating rating = filmStorage.getRating(1);
+        Rating rating = ratingStorage.getRating(1);
         Assertions.assertEquals(rating, Rating.builder().id(1).name("G").build());
     }
 
     @Test
     void getAllRatings() {
-        List<Rating> ratings = filmStorage.getAllRatings();
+        List<Rating> ratings = ratingStorage.getAllRatings();
         Assertions.assertEquals(5, ratings.size());
         Assertions.assertEquals(ratings.get(0), Rating.builder().id(1).name("G").build());
     }
-
 
 }

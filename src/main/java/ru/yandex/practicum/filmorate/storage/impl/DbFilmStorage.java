@@ -2,41 +2,36 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rating;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.util.SqlMapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @Slf4j
 public class DbFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final SqlMapper map;
-    private final NamedParameterJdbcTemplate namedParam;
+    private final GenreStorage genreStorage;
 
     @Autowired
-    public DbFilmStorage(JdbcTemplate jdbcTemplate, SqlMapper map, NamedParameterJdbcTemplate namedParam) {
+    public DbFilmStorage(JdbcTemplate jdbcTemplate, SqlMapper map, GenreStorage genreStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.map = map;
-        this.namedParam = namedParam;
+        this.genreStorage = genreStorage;
     }
 
     @Override
@@ -49,7 +44,7 @@ public class DbFilmStorage implements FilmStorage {
                     "WHERE FILM.ID = ?";
             Film film = jdbcTemplate.queryForObject(sqlQuery, map::mapRowToFilm, id);
             assert film != null;
-            film.setGenres(getFilmGenre(film.getId()));
+            film.setGenres(genreStorage.getFilmGenre(film.getId()));
 
             return Optional.of(film);
         } catch (EmptyResultDataAccessException e) {
@@ -63,8 +58,8 @@ public class DbFilmStorage implements FilmStorage {
                 "FROM FILM " +
                 "JOIN RATING AS r ON r.RATING_ID = FILM.RATING_ID ";
         List<Film> films = jdbcTemplate.query(sqlQuery, map::mapRowToFilm);
-        setFilmGenre(films);
-        return films; // ??
+        genreStorage.setFilmGenre(films);
+        return films;
     }
 
     @Override
@@ -84,7 +79,7 @@ public class DbFilmStorage implements FilmStorage {
 
         film.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
         if (film.getGenres() != null) {
-            setFilmGenre(film.getId(), film.getGenres());
+            genreStorage.setFilmGenre(film.getId(), film.getGenres());
         }
         return film;
     }
@@ -109,35 +104,10 @@ public class DbFilmStorage implements FilmStorage {
             jdbcTemplate.update(deleteSqlQuery, film.getId());
         } else {
             jdbcTemplate.update(deleteSqlQuery, film.getId());
-            setFilmGenre(film.getId(), film.getGenres());
-            film.setGenres(getFilmGenre(film.getId()));
+            genreStorage.setFilmGenre(film.getId(), film.getGenres());
+            film.setGenres(genreStorage.getFilmGenre(film.getId()));
         }
         return film;
-    }
-
-    @Override
-    public void addLike(Film film, User user) {
-        try {
-            String sqlQuery = "INSERT INTO FILM_LIKES (FILM_ID, USER_ID_LIKE) " +
-                    "VALUES (?, ?)";
-            jdbcTemplate.update(sqlQuery,
-                    film.getId(),
-                    user.getId());
-        } catch (DataIntegrityViolationException e) {
-            throw new NoSuchElementException("Ошибка при добавлении лайка. " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void deleteLike(Film film, User user) {
-        String sqlQuery = "DELETE FROM FILM_LIKES " +
-                "WHERE USER_ID_LIKE = ? AND FILM_ID = ?";
-        int rows = jdbcTemplate.update(sqlQuery,
-                user.getId(),
-                film.getId());
-        if (rows == 0) {
-            throw new NoSuchElementException("Отсутствует лайк для удаления.");
-        }
     }
 
     @Override
@@ -153,79 +123,8 @@ public class DbFilmStorage implements FilmStorage {
                 " ORDER BY LIKES DESC LIMIT ?;";
 
         List<Film> films = jdbcTemplate.query(sqlQuery, map::mapRowToFilm, count);
-        setFilmGenre(films);
+        genreStorage.setFilmGenre(films);
         return films;
-    }
-
-    @Override
-    public Genre getGenreById(Integer id) {
-        try {
-            String sqlQuery = "SELECT ID, NAME FROM GENRE WHERE ID = ?";
-            return jdbcTemplate.queryForObject(sqlQuery, map::mapRowToGenre, id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new NoSuchElementException("Жанр отсутствует." + e.getMessage());
-        }
-    }
-
-    @Override
-    public List<Genre> getFilmGenre(Integer id) {
-        String sqlQuery = "SELECT ID, NAME " +
-                "FROM GENRE " +
-                "WHERE ID IN (" +
-                "SELECT GENRE_ID " +
-                "FROM FILM_GENRE " +
-                "WHERE FILM_ID = ?" +
-                ")";
-        return jdbcTemplate.query(sqlQuery, map::mapRowToGenre, id);
-    }
-
-    @Override
-    public List<Genre> getAllFilmGenre() {
-        String sqlQuery = "SELECT ID, NAME FROM GENRE";
-        return jdbcTemplate.query(sqlQuery, map::mapRowToGenre);
-    }
-
-    @Override
-    public Rating getRating(Integer id) {
-        try {
-            String sqlQuery = "SELECT RATING_ID, RATING_NAME FROM RATING WHERE RATING_ID = ?";
-            return jdbcTemplate.queryForObject(sqlQuery, map::mapRowToRating, id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new NoSuchElementException("Указанный рейтинг отсутствует." + e.getMessage());
-        }
-    }
-
-    @Override
-    public List<Rating> getAllRatings() {
-        String sqlQuery = "SELECT RATING_ID, RATING_NAME FROM RATING";
-        return jdbcTemplate.query(sqlQuery, map::mapRowToRating);
-    }
-
-    private void setFilmGenre(List<Film> films) {
-        String sqlQuery =
-                "SELECT FILM_ID, g.ID AS genre_id, g.NAME " +
-                        "FROM FILM_GENRE AS fg " +
-                        "JOIN GENRE g ON g.ID = fg.GENRE_ID " +
-                        "WHERE FILM_ID IN (:ids)";
-
-        Set<Integer> ids = films.stream().map(Film::getId).collect(Collectors.toSet());
-        SqlParameterSource p = new MapSqlParameterSource("ids", ids);
-        namedParam.query(sqlQuery, p, (rs, rn) -> map.mapRowToFilmsWithGenres(rs, rn, films));
-    }
-
-    private void setFilmGenre(Integer filmId, List<Genre> genre) {
-        String sql = "INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) " +
-                "VALUES (?, ?)";
-        try {
-            jdbcTemplate.batchUpdate(sql, genre, 2,
-                    (ps, p) -> {
-                        ps.setInt(1, filmId);
-                        ps.setInt(2, p.getId());
-                    });
-        } catch (DuplicateKeyException e) {
-            e.getMessage();
-            e.printStackTrace();
-        }
     }
 
 }

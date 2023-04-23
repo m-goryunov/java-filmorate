@@ -1,22 +1,5 @@
-INSERT INTO RATING (RATING_ID, RATING_NAME)
-values (1, 'G');
-INSERT INTO RATING (RATING_ID, RATING_NAME)
-values (2, 'PG');
-INSERT INTO RATING (RATING_ID, RATING_NAME)
-values (3, 'PG-13');
-INSERT INTO RATING (RATING_ID, RATING_NAME)
-values (4, 'R');
-INSERT INTO RATING (RATING_ID, RATING_NAME)
-values (5, 'NC-17');
-INSERT INTO GENRE (ID, NAME)
-values (1, 'Комедия');
-INSERT INTO GENRE (ID, NAME)
-values (2, 'Драма');
-INSERT INTO GENRE (ID, NAME)
-values (3, 'Мультфильм');
-INSERT INTO GENRE (ID, NAME)
-values (4, 'Триллер');
-INSERT INTO GENRE (ID, NAME)
-values (5, 'Документальный');
-INSERT INTO GENRE (ID, NAME)
-values (6, 'Боевик');
+MERGE INTO RATING (RATING_ID, RATING_NAME)
+VALUES (1, 'G'), (2, 'PG'), (3, 'PG-13'), (4, 'R'), (5, 'NC-17');
+
+MERGE INTO GENRE (ID, NAME)
+VALUES (1, 'Комедия'), (2, 'Драма'), (3, 'Мультфильм'), (4, 'Триллер'), (5, 'Документальный'), (6, 'Боевик');

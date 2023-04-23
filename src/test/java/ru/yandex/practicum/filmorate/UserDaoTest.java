@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.impl.DbFriendStorage;
 import ru.yandex.practicum.filmorate.storage.impl.DbUserStorage;
 
 import java.time.LocalDate;
@@ -28,7 +29,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class UserDaoTest {
 
-    private final DbUserStorage storage;
+    private final DbUserStorage userStorage;
+    private final DbFriendStorage friendStorage;
 
     @Test
     void addFriend() {
@@ -38,9 +40,9 @@ public class UserDaoTest {
                 .name(null)
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
                 .build();
-        storage.createUser(wrongUser);
-        storage.addFriend(wrongUser, storage.getUserById(0).orElseThrow());
-        List<User> friends = storage.getFriendsList(storage.getUserById(0).orElseThrow());
+        userStorage.createUser(wrongUser);
+        friendStorage.addFriend(wrongUser, userStorage.getUserById(0).orElseThrow());
+        List<User> friends = friendStorage.getFriendsList(userStorage.getUserById(0).orElseThrow());
         Assertions.assertEquals(friends.size(), 0);
     }
 
@@ -52,15 +54,15 @@ public class UserDaoTest {
                 .name(null)
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
                 .build();
-        storage.createUser(wrongUser);
+        userStorage.createUser(wrongUser);
 
-        storage.addFriend(wrongUser, storage.getUserById(0).orElseThrow());
-        storage.addFriend(storage.getUserById(0).orElseThrow(), wrongUser);
-        List<User> friends = storage.getFriendsList(storage.getUserById(0).orElseThrow());
+        friendStorage.addFriend(wrongUser, userStorage.getUserById(0).orElseThrow());
+        friendStorage.addFriend(userStorage.getUserById(0).orElseThrow(), wrongUser);
+        List<User> friends = friendStorage.getFriendsList(userStorage.getUserById(0).orElseThrow());
         Assertions.assertEquals(friends.size(), 1);
 
-        storage.removeFriend(storage.getUserById(0).orElseThrow(), wrongUser);
-        List<User> friends2 = storage.getFriendsList(storage.getUserById(0).orElseThrow());
+        friendStorage.removeFriend(userStorage.getUserById(0).orElseThrow(), wrongUser);
+        List<User> friends2 = friendStorage.getFriendsList(userStorage.getUserById(0).orElseThrow());
         Assertions.assertEquals(friends2.size(), 0);
 
     }
@@ -73,18 +75,18 @@ public class UserDaoTest {
                 .name(null)
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
                 .build();
-        storage.createUser(wrongUser);
+        userStorage.createUser(wrongUser);
 
-        storage.addFriend(wrongUser, storage.getUserById(0).orElseThrow());
-        storage.addFriend(storage.getUserById(0).orElseThrow(), wrongUser);
-        List<User> friends = storage.getFriendsList(storage.getUserById(0).orElseThrow());
+        friendStorage.addFriend(wrongUser, userStorage.getUserById(0).orElseThrow());
+        friendStorage.addFriend(userStorage.getUserById(0).orElseThrow(), wrongUser);
+        List<User> friends = friendStorage.getFriendsList(userStorage.getUserById(0).orElseThrow());
         Assertions.assertEquals(friends.size(), 1);
         Assertions.assertEquals(friends.get(0), wrongUser);
     }
 
     @Test
     void getAllUsers() {
-        List<User> users = storage.getAllUsers();
+        List<User> users = userStorage.getAllUsers();
         Assertions.assertEquals(users.size(), 1);
         Assertions.assertEquals(users.get(0), User.builder()
                 .id(0)
@@ -97,7 +99,7 @@ public class UserDaoTest {
 
     @Test
     void getUserById() {
-        User user = storage.getUserById(0).orElseThrow();
+        User user = userStorage.getUserById(0).orElseThrow();
         assertThat(Optional.of(user))
                 .isPresent()
                 .hasValueSatisfying(it ->
@@ -118,7 +120,7 @@ public class UserDaoTest {
                 .name("testUser2")
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
                 .build();
-        User user = storage.createUser(wrongUser);
+        User user = userStorage.createUser(wrongUser);
         assertThat(Optional.ofNullable(user))
                 .isPresent()
                 .hasValueSatisfying(it ->
@@ -140,9 +142,9 @@ public class UserDaoTest {
                 .birthday(LocalDate.of(1986, Month.AUGUST, 21))
                 .build();
 
-        storage.updateUser(updatedUser);
+        userStorage.updateUser(updatedUser);
 
-        User testUser = storage.getUserById(0).orElseThrow();
+        User testUser = userStorage.getUserById(0).orElseThrow();
 
         assertThat(Optional.of(testUser))
                 .isPresent()

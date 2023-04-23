@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Component
 public class SqlMapper {
@@ -33,23 +33,21 @@ public class SqlMapper {
                 .build();
     }
 
-    public List<Film> mapRowToFilmsWithGenres(ResultSet resultSet, int rowNum, List<Film> films) throws SQLException {
+    public List<Film> mapRowToFilmsWithGenres(ResultSet resultSet, int rowNum, Map<Integer, Film> films) throws SQLException {
         Integer filmId = resultSet.getInt("FILM_ID");
 
-        Optional<Film> film = films.stream()
-                .filter(it -> it.getId().equals(filmId))
-                .findFirst();
+        Film film = films.get(filmId);
 
-        if (film.isPresent()) {
+        if (film != null) {
             List<Genre> genres;
-            if (film.get().getGenres() != null) {
-                genres = film.get().getGenres();
+            if (film.getGenres() != null) {
+                genres = film.getGenres();
             } else genres = new ArrayList<>();
             genres.add(Genre.builder()
                     .id(resultSet.getInt("ID"))
                     .name(resultSet.getString("NAME"))
                     .build());
-            film.get().setGenres(genres);
+            film.setGenres(genres);
         }
         return null;
     }

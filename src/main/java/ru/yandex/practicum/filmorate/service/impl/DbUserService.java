@@ -1,69 +1,64 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
 @Service
-@Primary
 public class DbUserService implements UserService {
 
-    private final UserStorage storage;
+    private final UserStorage userStorage;
+    private final FriendStorage friendStorage;
 
-    @Autowired
-    public DbUserService(@Qualifier("dbUserStorage") UserStorage storage) {
-        this.storage = storage;
+    public DbUserService(UserStorage userStorage, FriendStorage friendStorage) {
+        this.userStorage = userStorage;
+        this.friendStorage = friendStorage;
     }
 
     @Override
     public void addFriend(User user, User otherUser) {
-        storage.addFriend(user, otherUser);
+        friendStorage.addFriend(user, otherUser);
     }
 
     @Override
     public void removeFriend(User user, User otherUser) {
-        storage.removeFriend(user, otherUser);
+        friendStorage.removeFriend(user, otherUser);
     }
 
     @Override
     public List<User> getMutualFriends(User user, User otherUser) {
-        List<User> a = getFriendsList(user);
-        List<User> b = getFriendsList(otherUser);
-        a.retainAll(b);
-        return a;
+        return friendStorage.getMutualFriends(user, otherUser);
     }
 
     @Override
     public List<User> getFriendsList(User user) {
-        return storage.getFriendsList(user);
+        return friendStorage.getFriendsList(user);
     }
 
     @Override
     public List<User> getAllUsers() {
-        return storage.getAllUsers();
+        return userStorage.getAllUsers();
     }
 
     @Override
     public User getUserById(Integer id) {
-        return storage.getUserById(id).orElseThrow(()
+        return userStorage.getUserById(id).orElseThrow(()
                 -> new EntityNotFoundException("Фильм/Пользователь не найден.", getClass().toString()));
     }
 
     @Override
     public User addUser(User user) {
-        return storage.createUser(user);
+        return userStorage.createUser(user);
     }
 
     @Override
     public User updateUser(User user) {
-        storage.updateUser(user);
-        return getUserById(user.getId());
+        userStorage.updateUser(user);
+        return user;
     }
 }
