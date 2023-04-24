@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.util.SqlMapper;
 
 import java.sql.Date;
@@ -18,24 +17,21 @@ import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component
 @Slf4j
-public class DbFilmStorage implements FilmStorage {
+public class FilmStorageImpl implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final SqlMapper map;
-    private final GenreStorage genreStorage;
 
     @Autowired
-    public DbFilmStorage(JdbcTemplate jdbcTemplate, SqlMapper map, GenreStorage genreStorage) {
+    public FilmStorageImpl(JdbcTemplate jdbcTemplate, SqlMapper map) {
         this.jdbcTemplate = jdbcTemplate;
         this.map = map;
-        this.genreStorage = genreStorage;
     }
 
     @Override
-    public Optional<Film> getFilmById(Integer id) {
+    public Film getFilmById(Integer id) {
         try {
             String sqlQuery = "SELECT FILM.ID, FILM.NAME, DESCRIPTION, DURATION, RELEASE_DATE," +
                     " FILM.RATING_ID, r.RATING_NAME " +
@@ -44,9 +40,7 @@ public class DbFilmStorage implements FilmStorage {
                     "WHERE FILM.ID = ?";
             Film film = jdbcTemplate.queryForObject(sqlQuery, map::mapRowToFilm, id);
             assert film != null;
-            film.setGenres(genreStorage.getFilmGenre(film.getId()));
-
-            return Optional.of(film);
+            return film;
         } catch (EmptyResultDataAccessException e) {
             throw new NoSuchElementException("Фильм не существует." + e.getMessage());
         }
@@ -58,7 +52,6 @@ public class DbFilmStorage implements FilmStorage {
                 "FROM FILM " +
                 "JOIN RATING AS r ON r.RATING_ID = FILM.RATING_ID ";
         List<Film> films = jdbcTemplate.query(sqlQuery, map::mapRowToFilm);
-        genreStorage.setFilmGenre(films);
         return films;
     }
 
@@ -78,9 +71,6 @@ public class DbFilmStorage implements FilmStorage {
         }, keyHolder);
 
         film.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
-        if (film.getGenres() != null) {
-            genreStorage.setFilmGenre(film.getId(), film.getGenres());
-        }
         return film;
     }
 
@@ -100,13 +90,7 @@ public class DbFilmStorage implements FilmStorage {
         if (rows == 0) {
             throw new EntityNotFoundException("Обновление несуществующего фильма.", getClass().toString());
         }
-        if (film.getGenres() == null) {
-            jdbcTemplate.update(deleteSqlQuery, film.getId());
-        } else {
-            jdbcTemplate.update(deleteSqlQuery, film.getId());
-            genreStorage.setFilmGenre(film.getId(), film.getGenres());
-            film.setGenres(genreStorage.getFilmGenre(film.getId()));
-        }
+        jdbcTemplate.update(deleteSqlQuery, film.getId());
         return film;
     }
 
@@ -123,7 +107,6 @@ public class DbFilmStorage implements FilmStorage {
                 " ORDER BY LIKES DESC LIMIT ?;";
 
         List<Film> films = jdbcTemplate.query(sqlQuery, map::mapRowToFilm, count);
-        genreStorage.setFilmGenre(films);
         return films;
     }
 

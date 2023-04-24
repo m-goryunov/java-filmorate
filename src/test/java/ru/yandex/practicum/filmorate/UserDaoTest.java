@@ -9,8 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.impl.DbFriendStorage;
-import ru.yandex.practicum.filmorate.storage.impl.DbUserStorage;
+import ru.yandex.practicum.filmorate.storage.impl.FriendStorageImpl;
+import ru.yandex.practicum.filmorate.storage.impl.UserStorageImpl;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -29,8 +29,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class UserDaoTest {
 
-    private final DbUserStorage userStorage;
-    private final DbFriendStorage friendStorage;
+    private final UserStorageImpl userStorage;
+    private final FriendStorageImpl friendStorage;
 
     @Test
     void addFriend() {
@@ -41,8 +41,8 @@ public class UserDaoTest {
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
                 .build();
         userStorage.createUser(wrongUser);
-        friendStorage.addFriend(wrongUser, userStorage.getUserById(0).orElseThrow());
-        List<User> friends = friendStorage.getFriendsList(userStorage.getUserById(0).orElseThrow());
+        friendStorage.addFriend(wrongUser, userStorage.getUserById(0));
+        List<User> friends = friendStorage.getFriendsList(userStorage.getUserById(0));
         Assertions.assertEquals(friends.size(), 0);
     }
 
@@ -56,13 +56,13 @@ public class UserDaoTest {
                 .build();
         userStorage.createUser(wrongUser);
 
-        friendStorage.addFriend(wrongUser, userStorage.getUserById(0).orElseThrow());
-        friendStorage.addFriend(userStorage.getUserById(0).orElseThrow(), wrongUser);
-        List<User> friends = friendStorage.getFriendsList(userStorage.getUserById(0).orElseThrow());
+        friendStorage.addFriend(wrongUser, userStorage.getUserById(0));
+        friendStorage.addFriend(userStorage.getUserById(0), wrongUser);
+        List<User> friends = friendStorage.getFriendsList(userStorage.getUserById(0));
         Assertions.assertEquals(friends.size(), 1);
 
-        friendStorage.removeFriend(userStorage.getUserById(0).orElseThrow(), wrongUser);
-        List<User> friends2 = friendStorage.getFriendsList(userStorage.getUserById(0).orElseThrow());
+        friendStorage.removeFriend(userStorage.getUserById(0), wrongUser);
+        List<User> friends2 = friendStorage.getFriendsList(userStorage.getUserById(0));
         Assertions.assertEquals(friends2.size(), 0);
 
     }
@@ -77,9 +77,9 @@ public class UserDaoTest {
                 .build();
         userStorage.createUser(wrongUser);
 
-        friendStorage.addFriend(wrongUser, userStorage.getUserById(0).orElseThrow());
-        friendStorage.addFriend(userStorage.getUserById(0).orElseThrow(), wrongUser);
-        List<User> friends = friendStorage.getFriendsList(userStorage.getUserById(0).orElseThrow());
+        friendStorage.addFriend(wrongUser, userStorage.getUserById(0));
+        friendStorage.addFriend(userStorage.getUserById(0), wrongUser);
+        List<User> friends = friendStorage.getFriendsList(userStorage.getUserById(0));
         Assertions.assertEquals(friends.size(), 1);
         Assertions.assertEquals(friends.get(0), wrongUser);
     }
@@ -99,7 +99,7 @@ public class UserDaoTest {
 
     @Test
     void getUserById() {
-        User user = userStorage.getUserById(0).orElseThrow();
+        User user = userStorage.getUserById(0);
         assertThat(Optional.of(user))
                 .isPresent()
                 .hasValueSatisfying(it ->
@@ -144,7 +144,7 @@ public class UserDaoTest {
 
         userStorage.updateUser(updatedUser);
 
-        User testUser = userStorage.getUserById(0).orElseThrow();
+        User testUser = userStorage.getUserById(0);
 
         assertThat(Optional.of(testUser))
                 .isPresent()

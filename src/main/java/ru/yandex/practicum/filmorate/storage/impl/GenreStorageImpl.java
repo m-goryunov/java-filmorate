@@ -22,14 +22,14 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class DbGenreStorage implements GenreStorage {
+public class GenreStorageImpl implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final SqlMapper map;
     private final NamedParameterJdbcTemplate namedParam;
 
     @Autowired
-    public DbGenreStorage(JdbcTemplate jdbcTemplate, SqlMapper map, NamedParameterJdbcTemplate namedParam) {
+    public GenreStorageImpl(JdbcTemplate jdbcTemplate, SqlMapper map, NamedParameterJdbcTemplate namedParam) {
         this.jdbcTemplate = jdbcTemplate;
         this.map = map;
         this.namedParam = namedParam;

@@ -14,14 +14,14 @@ import java.util.NoSuchElementException;
 
 @Component
 @Slf4j
-public class DbRatingStorage implements RatingStorage {
+public class RatingStorageImpl implements RatingStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final SqlMapper map;
 
 
     @Autowired
-    public DbRatingStorage(JdbcTemplate jdbcTemplate, SqlMapper map) {
+    public RatingStorageImpl(JdbcTemplate jdbcTemplate, SqlMapper map) {
         this.jdbcTemplate = jdbcTemplate;
         this.map = map;
     }

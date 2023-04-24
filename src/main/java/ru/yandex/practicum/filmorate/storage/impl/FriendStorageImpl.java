@@ -13,13 +13,13 @@ import java.util.NoSuchElementException;
 
 @Component
 @Slf4j
-public class DbFriendStorage implements FriendStorage {
+public class FriendStorageImpl implements FriendStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final SqlMapper mapper;
 
     @Autowired
-    public DbFriendStorage(JdbcTemplate jdbcTemplate, SqlMapper mapper) {
+    public FriendStorageImpl(JdbcTemplate jdbcTemplate, SqlMapper mapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.mapper = mapper;
     }
@@ -52,10 +52,11 @@ public class DbFriendStorage implements FriendStorage {
 
     @Override
     public List<User> getMutualFriends(User user, User friend) {
-        String sqlQuery = "SELECT ID, NAME, LOGIN, EMAIL, BIRTHDAY " +
-                "FROM USER_FILMORATE WHERE ID IN" +
-                "(SELECT FRIEND_ID FROM USER_FRIENDS WHERE USER_ID = ? " +
-                "AND FRIEND_ID IN (SELECT FRIEND_ID FROM USER_FRIENDS WHERE USER_ID = ?))";
+        String sqlQuery = "SELECT * FROM USER_FILMORATE u, USER_FRIENDS f, USER_FRIENDS o " +
+                "         WHERE u.USER_ID = f.FRIEND_ID " +
+                "         AND u.USER_ID = o.FRIEND_ID " +
+                "         AND f.USER_ID = ? AND o.USER_ID = ?";
+
         return jdbcTemplate.query(sqlQuery, mapper::mapRowToUser, user.getId(), friend.getId());
     }
 }

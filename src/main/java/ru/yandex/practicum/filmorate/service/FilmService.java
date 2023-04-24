@@ -33,4 +33,8 @@ public interface FilmService {
     Rating getRating(Integer id);
 
     List<Rating> getAllRatings();
+
+    void setFilmGenre(List<Film> films);
+
+    void setFilmGenre(Integer filmId, List<Genre> genre);
 }

@@ -33,10 +33,12 @@ create table IF NOT EXISTS USER_FILMORATE
     EMAIL    VARCHAR,
     LOGIN    VARCHAR,
     BIRTHDAY DATE     NOT NULL,
-    NAME     CHARACTER VARYING,
+    NAME     VARCHAR,
     constraint USER_ID
         primary key (ID)
 );
+create unique index if not exists USER_EMAIL_UINDEX on USER_FILMORATE (email);
+create unique index if not exists USER_LOGIN_UINDEX on USER_FILMORATE (login);
 
 create table IF NOT EXISTS GENRE
 (

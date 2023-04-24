@@ -13,11 +13,11 @@ import java.util.NoSuchElementException;
 
 @Component
 @Slf4j
-public class DbLikeStorage implements LikeStorage {
+public class LikeStorageImpl implements LikeStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public DbLikeStorage(JdbcTemplate jdbcTemplate) {
+    public LikeStorageImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

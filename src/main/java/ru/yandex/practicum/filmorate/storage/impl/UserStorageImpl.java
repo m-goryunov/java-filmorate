@@ -16,17 +16,16 @@ import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component
 @Slf4j
-public class DbUserStorage implements UserStorage {
+public class UserStorageImpl implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final SqlMapper mapper;
 
     @Autowired
-    public DbUserStorage(JdbcTemplate jdbcTemplate, SqlMapper mapper) {
+    public UserStorageImpl(JdbcTemplate jdbcTemplate, SqlMapper mapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.mapper = mapper;
     }
@@ -38,12 +37,12 @@ public class DbUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> getUserById(Integer id) {
+    public User getUserById(Integer id) {
         try {
             String sqlQuery = "SELECT ID, EMAIL, LOGIN, BIRTHDAY,NAME " +
                     "FROM USER_FILMORATE " +
                     "WHERE ID = ?";
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, mapper::mapRowToUser, id));
+            return jdbcTemplate.queryForObject(sqlQuery, mapper::mapRowToUser, id);
         } catch (Exception e) {
             throw new EntityNotFoundException("Ошибка при получении пользователя", e.getMessage());
         }

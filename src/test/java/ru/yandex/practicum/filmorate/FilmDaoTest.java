@@ -12,10 +12,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.impl.DbFilmStorage;
-import ru.yandex.practicum.filmorate.storage.impl.DbGenreStorage;
-import ru.yandex.practicum.filmorate.storage.impl.DbLikeStorage;
-import ru.yandex.practicum.filmorate.storage.impl.DbRatingStorage;
+import ru.yandex.practicum.filmorate.storage.impl.FilmStorageImpl;
+import ru.yandex.practicum.filmorate.storage.impl.GenreStorageImpl;
+import ru.yandex.practicum.filmorate.storage.impl.LikeStorageImpl;
+import ru.yandex.practicum.filmorate.storage.impl.RatingStorageImpl;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -35,10 +35,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 })
 class FilmDaoTest {
 
-    private final DbFilmStorage filmStorage;
-    private final DbLikeStorage likeStorage;
-    private final DbGenreStorage genreStorage;
-    private final DbRatingStorage ratingStorage;
+    private final FilmStorageImpl filmStorage;
+    private final LikeStorageImpl likeStorage;
+    private final GenreStorageImpl genreStorage;
+    private final RatingStorageImpl ratingStorage;
 
     Rating testRating = Rating.builder()
             .id(1)
@@ -64,7 +64,7 @@ class FilmDaoTest {
 
     @Test
     void getFilmById() {
-        Film film = filmStorage.getFilmById(0).orElseThrow();
+        Film film = filmStorage.getFilmById(0);
         assertThat(Optional.of(film))
                 .isPresent()
                 .hasValueSatisfying(it ->
@@ -120,7 +120,7 @@ class FilmDaoTest {
                 .build();
 
         filmStorage.updateFilm(updatedFilm);
-        Film testFilm = filmStorage.getFilmById(updatedFilm.getId()).orElseThrow();
+        Film testFilm = filmStorage.getFilmById(updatedFilm.getId());
 
         assertThat(Optional.of(testFilm))
                 .isPresent()

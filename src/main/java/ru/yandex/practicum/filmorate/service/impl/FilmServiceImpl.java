@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -17,15 +16,15 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class DbFilmService implements FilmService {
+public class FilmServiceImpl implements FilmService {
 
-    private final FilmStorage storage;
+    private final FilmStorage filmStorage;
     private final LikeStorage likeStorage;
     private final GenreStorage genreStorage;
     private final RatingStorage ratingStorage;
 
-    public DbFilmService(FilmStorage storage, LikeStorage likeStorage, GenreStorage genreStorage, RatingStorage ratingStorage) {
-        this.storage = storage;
+    public FilmServiceImpl(FilmStorage filmStorage, LikeStorage likeStorage, GenreStorage genreStorage, RatingStorage ratingStorage) {
+        this.filmStorage = filmStorage;
         this.likeStorage = likeStorage;
         this.genreStorage = genreStorage;
         this.ratingStorage = ratingStorage;
@@ -33,23 +32,36 @@ public class DbFilmService implements FilmService {
 
     @Override
     public Film getFilmById(Integer id) {
-        return storage.getFilmById(id).orElseThrow(() ->
-                new EntityNotFoundException("Фильм/Пользователь не найден.", getClass().toString()));
+        Film film = filmStorage.getFilmById(id);
+        genreStorage.setFilmGenre(List.of(film));
+        return film;
     }
 
     @Override
     public List<Film> getAllFilms() {
-        return storage.getAllFilms();
+        List<Film> films = filmStorage.getAllFilms();
+        genreStorage.setFilmGenre(films);
+        return films;
     }
 
     @Override
     public Film createFilm(Film film) {
-        return storage.createFilm(film);
+        Film film1 = filmStorage.createFilm(film);
+        if (film1.getGenres() != null) {
+            setFilmGenre(film1.getId(), film1.getGenres());
+        }
+
+        return film1;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        return storage.updateFilm(film);
+        Film film1 = filmStorage.updateFilm(film);
+        if (film1.getGenres() != null) {
+            setFilmGenre(film.getId(), film.getGenres());
+            film.setGenres(getFilmGenre(film.getId()));
+        }
+        return film1;
     }
 
     @Override
@@ -64,7 +76,9 @@ public class DbFilmService implements FilmService {
 
     @Override
     public List<Film> getMostPopularFilms(Integer count) {
-        return storage.getMostPopularFilms(count);
+        List<Film> films = filmStorage.getMostPopularFilms(count);
+        setFilmGenre(films);
+        return films;
     }
 
     @Override
@@ -90,5 +104,15 @@ public class DbFilmService implements FilmService {
     @Override
     public List<Rating> getAllRatings() {
         return ratingStorage.getAllRatings();
+    }
+
+    @Override
+    public void setFilmGenre(List<Film> films) {
+        genreStorage.setFilmGenre(films);
+    }
+
+    @Override
+    public void setFilmGenre(Integer filmId, List<Genre> genre) {
+        genreStorage.setFilmGenre(filmId, genre);
     }
 }
