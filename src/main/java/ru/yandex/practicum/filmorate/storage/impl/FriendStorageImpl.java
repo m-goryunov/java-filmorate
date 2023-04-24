@@ -52,10 +52,10 @@ public class FriendStorageImpl implements FriendStorage {
 
     @Override
     public List<User> getMutualFriends(User user, User friend) {
-        String sqlQuery = "SELECT * FROM USER_FILMORATE u, USER_FRIENDS f, USER_FRIENDS o " +
-                "         WHERE u.USER_ID = f.FRIEND_ID " +
-                "         AND u.USER_ID = o.FRIEND_ID " +
-                "         AND f.USER_ID = ? AND o.USER_ID = ?";
+        String sqlQuery = "SELECT ID, NAME, LOGIN, EMAIL, BIRTHDAY " +
+                "FROM USER_FILMORATE WHERE ID IN" +
+                "(SELECT FRIEND_ID FROM USER_FRIENDS WHERE USER_ID = ? " +
+                "AND FRIEND_ID IN (SELECT FRIEND_ID FROM USER_FRIENDS WHERE USER_ID = ?))";
 
         return jdbcTemplate.query(sqlQuery, mapper::mapRowToUser, user.getId(), friend.getId());
     }
