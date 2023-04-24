@@ -35,7 +35,7 @@ public class UserDaoTest {
     @Test
     void addFriend() {
         User wrongUser = User.builder()
-                .email("mail@mail.com")
+                .email("mail1@mail.com")
                 .login("testUser2")
                 .name(null)
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
@@ -49,7 +49,7 @@ public class UserDaoTest {
     @Test
     void removeFriend() {
         User wrongUser = User.builder()
-                .email("mail@mail.com")
+                .email("mail2@mail.com")
                 .login("testUser2")
                 .name(null)
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
@@ -70,7 +70,7 @@ public class UserDaoTest {
     @Test
     void getFriendsList() {
         User wrongUser = User.builder()
-                .email("mail@mail.com")
+                .email("mail3@mail.com")
                 .login("testUser2")
                 .name(null)
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
@@ -115,7 +115,7 @@ public class UserDaoTest {
     @Test
     void createUser() {
         User wrongUser = User.builder()
-                .email("mail@mail.com")
+                .email("mail4@mail.com")
                 .login("testUser2")
                 .name("testUser2")
                 .birthday(LocalDate.of(1985, Month.AUGUST, 21))
@@ -125,7 +125,7 @@ public class UserDaoTest {
                 .isPresent()
                 .hasValueSatisfying(it ->
                         assertThat(it)
-                                .hasFieldOrPropertyWithValue("email", "mail@mail.com")
+                                .hasFieldOrPropertyWithValue("email", "mail4@mail.com")
                                 .hasFieldOrPropertyWithValue("login", "testUser2")
                                 .hasFieldOrPropertyWithValue("name", "testUser2")
                                 .hasFieldOrPropertyWithValue("birthday", LocalDate.of(1985, Month.AUGUST, 21))
